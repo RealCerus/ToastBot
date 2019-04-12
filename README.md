@@ -1,7 +1,7 @@
-#Toast Bot
+# Toast Bot
 Toast Bot is a neat Discord bot that brings a little bit of fun to your guild.
 
-##Features
+## Features
 The bot features a few commands (and more are to come):
 
 - help
@@ -30,5 +30,5 @@ Type `+bot-channel add` in a text channel of your choice to register it as a bot
 \
 You are also able to change the command prefix for your guild. Just type `+set-prefix <new prefix>` in the previously registered bot channel to change it.
 
-##Self hosted bot
+## Self hosted bot
 You can download the latest release on the release tab and run it in the command line with `java -jar ToastBot-VERSION.jar`. Notice that you need to change the filename at the end of the command to the filename of the downloaded file. You may also add different arguments.
