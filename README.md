@@ -16,7 +16,7 @@ The bot features a few commands (and more are to come):
 The default command prefix is `+`.\
 The `toast` command will generate an image like this:\
 ![Image](https://img.cerus-dev.de/toast_cmd_prev.png)\
-The `toastify` command will generate an image like this: The `toastify` command will generate an image like this:\
+The `toastify` command will generate an image like this:\
 ![Image](https://img.cerus-dev.de/toastify_cmd_prev.png)\
 
 ##Setup
