@@ -103,6 +103,9 @@ public class EmbedUtil {
                 // Deleting the uploaded image so we don't waste any DropBox storage space
                 try {
                     client.files().deleteV2(metadata.getPathDisplay());
+                    if (toastFile.exists())
+                        // Deleting the saved file so we don't waste any disk space
+                        toastFile.delete();
                 } catch (DeleteErrorException ignored) {
                 }
 
@@ -120,9 +123,6 @@ public class EmbedUtil {
             } catch (IOException | DbxException | InterruptedException e) {
                 e.printStackTrace();
             }
-
-            // Deleting the saved file so we don't waste any disk space
-            toastFile.delete();
         }).start();
     }
 
@@ -168,18 +168,20 @@ public class EmbedUtil {
                                     .setImage(link == null ? "http://placeholder.something" : link)
                                     .build()
                     ).complete();
-                    if(link == null)
+                    if (link == null)
                         message.getChannel().sendFile(file).complete();
                 } catch (ErrorResponseException ignored) {
                 }
 
-                if(link == null) return;
+                if (link == null) return;
                 // Waiting five minutes and delete the image from DropBox afterwards
                 Thread.sleep((5 * 60) * 1000);
 
                 // Deleting the uploaded image so we don't waste any DropBox storage space
                 try {
                     client.files().deleteV2(metadata.getPathDisplay());
+                    if (file.exists())
+                        file.delete();
                 } catch (DeleteErrorException ignored) {
                 }
             } catch (IOException | DbxException | InterruptedException e) {

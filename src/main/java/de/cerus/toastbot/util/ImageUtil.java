@@ -9,16 +9,14 @@ package de.cerus.toastbot.util;
 
 import de.cerus.toastbot.launcher.BotLauncher;
 import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.io.FileUtils;
 import sun.awt.image.ToolkitImage;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -171,7 +169,7 @@ public class ImageUtil {
                 stringWidth = graphics.getFontMetrics(tempFont).stringWidth(user.getName());
             }
             // Drawing the name
-            graphics.drawString(user.getName(), (toastImage.getWidth() / 2) - stringWidth / 2, toastImage.getHeight() / 2);
+            graphics.drawString(user.getName().toLowerCase().trim(), (toastImage.getWidth() / 2) - stringWidth / 2, toastImage.getHeight() / 2);
             graphics.dispose();
 
             File directory = new File("./toast-images/");
@@ -190,6 +188,10 @@ public class ImageUtil {
     public static void load() {
         GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
         try {
+            File fontFile = new File("./yummy_bread.ttf");
+            if(!fontFile.exists()){
+                FileUtils.copyURLToFile(new java.net.URL("http://cerus-dev.de/dl/toastbot/yummy_bread.ttf"), fontFile);
+            }
             graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("./yummy_bread.ttf")));
         } catch (FontFormatException | IOException e) {
             e.printStackTrace();
@@ -197,36 +199,33 @@ public class ImageUtil {
 
         if (!toast.exists()) {
             try {
-                java.net.URL url = BotLauncher.class.getClassLoader().getResource("toast.jpg");
-
-                File fileToCopy = new File(url.toURI());
-
-                Files.copy(fileToCopy.toPath(), toast.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (URISyntaxException | IOException e) {
+                InputStream stream = BotLauncher.class.getClassLoader().getResourceAsStream("toast.jpg");
+                if(stream == null)
+                    stream = BotLauncher.class.getClassLoader().getResourceAsStream("/toast.jpg");
+                Files.copy(stream, toast.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
         if (!wheatField.exists()) {
             try {
-                java.net.URL url = BotLauncher.class.getClassLoader().getResource("wheat_field.jpg");
-
-                File fileToCopy = new File(url.toURI());
-
-                Files.copy(fileToCopy.toPath(), wheatField.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (URISyntaxException | IOException e) {
+                InputStream stream = BotLauncher.class.getClassLoader().getResourceAsStream("wheat_field.jpg");
+                if(stream == null)
+                    stream = BotLauncher.class.getClassLoader().getResourceAsStream("/wheat_field.jpg");
+                Files.copy(stream, wheatField.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
         if (!miniToast.exists()) {
             try {
-                java.net.URL url = BotLauncher.class.getClassLoader().getResource("mini_toast.gif");
-
-                File fileToCopy = new File(url.toURI());
-
-                Files.copy(fileToCopy.toPath(), miniToast.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (URISyntaxException | IOException e) {
+                InputStream stream = BotLauncher.class.getClassLoader().getResourceAsStream("mini_toast.gif");
+                if(stream == null)
+                    stream = BotLauncher.class.getClassLoader().getResourceAsStream("/mini_toast.gif");
+                Files.copy(stream, wheatField.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
