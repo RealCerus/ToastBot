@@ -23,7 +23,11 @@ public class BotChannelUCommand extends UserCommand {
 
     @Override
     public void execute(String usedCommand, Member invoker, Message message, TextChannel channel, String[] args) {
-        if (!invoker.hasPermission(Permission.MANAGE_CHANNEL)) return;
+        if (!invoker.hasPermission(Permission.MANAGE_CHANNEL)) {
+            if (BotChannelUtil.isBotChannel(channel.getIdLong()))
+                sendFailure(channel, invoker.getUser(), "Sorry, it seems like you don't have the required permissions (Manage channels) for this action.");
+            return;
+        }
 
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("add")) {
