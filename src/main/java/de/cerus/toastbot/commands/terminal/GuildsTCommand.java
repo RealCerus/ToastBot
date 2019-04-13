@@ -9,9 +9,11 @@ package de.cerus.toastbot.commands.terminal;
 
 import de.cerus.toastbot.command.TerminalCommand;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
 
 import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
 
 public class GuildsTCommand extends TerminalCommand {
     private JDA jda;
@@ -30,7 +32,11 @@ public class GuildsTCommand extends TerminalCommand {
             System.out.println("Guild '" + guild.getName() + "':");
             System.out.println("   Guild id: " + guild.getId());
             System.out.println("   Owner: " + guild.getOwner().getUser().getAsTag());
-            System.out.println("   Members: " + guild.getMembers().size());
+            System.out.println("   > Memberinfo");
+            System.out.println("     Members: " + (int) guild.getMembers().stream().filter(member -> !member.getUser().isBot()).count());
+            System.out.println("     Bots: " + (int) guild.getMembers().stream().filter(member -> member.getUser().isBot()).count());
+            System.out.println("     Total: " + guild.getMembers().size());
+            System.out.println("   Emotes: "+guild.getEmotes().size());
             System.out.println("   Bot join date: " + guild.getMember(jda.getSelfUser()).getTimeJoined().format(DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm:ss a")));
             displayedGuilds++;
         }
