@@ -1,4 +1,4 @@
-![GitHub Releases](https://img.shields.io/github/downloads/RealCerus/ToastBot/0.1.0/total.svg?style=flat-square) ![Discord](https://img.shields.io/discord/565825337108463626.svg?style=flat-square) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/RealCerus/ToastBot.svg?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/RealCerus/ToastBot.svg?style=flat-square)
+![GitHub Releases](https://img.shields.io/github/downloads/RealCerus/ToastBot/0.1.1/total.svg?style=flat-square) ![Discord](https://img.shields.io/discord/565825337108463626.svg?style=flat-square) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/RealCerus/ToastBot.svg?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/RealCerus/ToastBot.svg?style=flat-square) [![Build Status](https://ci.lukassp.de/job/Cerus-ToastBot/badge/icon)](https://ci.lukassp.de/job/Cerus-ToastBot/)
 
 # Toast Bot
 Toast Bot is a neat Discord bot that brings a little bit of fun to your guild.\
@@ -35,5 +35,5 @@ Type `+bot-channel add` in a text channel of your choice to register it as a bot
 You are also able to change the command prefix for your guild. Just type `+set-prefix <new prefix>` in the previously registered bot channel to change it.
 
 ## Self hosted bot
-Latest version: ![JitPack](https://img.shields.io/jitpack/v/github/RealCerus/ToastBot.svg?color=lightblue)\
-You can download the latest release on the release tab and run it in the command line with `java -jar ToastBot-VERSION.jar`. Notice that you need to change the filename at the end of the command to the filename of the downloaded file. You may also add different arguments.
+Latest version: ![Jenkins](https://ci.lukassp.de/job/Cerus-ToastBot/badge/icon?style=flat-square?color=lightblue)\
+You can download the latest release on the release tab or on [Jenkins](https://ci.lukassp.de/job/Cerus-ToastBot/) and run it in the command line with `java -jar ToastBot-VERSION.jar`. Notice that you need to change the filename at the end of the command to the filename of the downloaded file. You may also add different arguments.
