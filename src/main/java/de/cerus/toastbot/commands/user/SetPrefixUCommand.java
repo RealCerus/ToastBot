@@ -33,7 +33,6 @@ public class SetPrefixUCommand extends UserCommand {
             StringBuilder prefix = new StringBuilder();
             for(int i = 0; i < args.length; i++)
                 prefix.append(" ").append(args[i]);
-            System.out.println("'"+prefix.toString()+"'");
             getSettings().setCommandPrefix(channel.getGuild(), prefix.toString().substring(1));
             sendSuccess(channel, invoker.getUser(), "My command prefix for this guild was changed to `"+getSettings().getCommandPrefix(channel.getGuild())+"`!");
             return;

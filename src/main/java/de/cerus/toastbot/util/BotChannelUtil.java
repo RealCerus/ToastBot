@@ -50,7 +50,11 @@ public class BotChannelUtil {
         return botChannels.contains(id);
     }
 
-    public static void shutdown() {
+    public static void shutdown(){
+        saveChannels();
+    }
+
+    public static void saveChannels() {
         if (file == null) return;
         commentedFileConfig.set("bot-channels", botChannels);
         commentedFileConfig.save();

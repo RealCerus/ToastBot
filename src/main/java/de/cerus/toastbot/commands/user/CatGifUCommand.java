@@ -32,6 +32,7 @@ public class CatGifUCommand extends UserCommand {
 
     public CatGifUCommand(DiscordBotListAPI botListAPI) {
         super("cat-gif");
+        setDescription("Sends a random cat gif from Giphy.");
         this.cooldown = new ArrayList<>();
         this.botListAPI = botListAPI;
     }
@@ -54,23 +55,34 @@ public class CatGifUCommand extends UserCommand {
         }
         cooldown.add(invoker.getIdLong());
 
-        // TODO: User Vote Check
+        botListAPI.hasVoted(invoker.getId()).whenComplete((hasVoted, e) -> {
+            if(getSettings().isVoteNeededForGifCommand()){
+                if(e != null) {
+                    sendFailure(channel, invoker.getUser(), "Failed to verify your vote. Please try again later.");
+                    return;
+                }
+                if(!hasVoted){
+                    sendFailure(channel, invoker.getUser(), "This command is for voters only! Vote [here](https://discordbots.org/bot/565579372128501776)");
+                    return;
+                }
+            }
 
-        try {
-            SearchRandom data = giphy.searchRandom("cat");
-            channel.sendMessage(
-                    new EmbedBuilder()
-                            .setColor(COLOR_GREEN)
-                            .setTitle("Cat GIF", data.getData().getUrl())
-                            .setDescription("Here is your cat gif!")
-                            .setImage(data.getData().getImageUrl())
-                            .setFooter("Powered by Giphy", "https://img.cerus-dev.de/giphy.gif")
-                            .build()
-            ).complete();
-        } catch (GiphyException e) {
-            e.printStackTrace();
-            sendFailure(channel, invoker.getUser(), "Failed to load a gif");
-        }
+            try {
+                SearchRandom data = giphy.searchRandom("cat");
+                channel.sendMessage(
+                        new EmbedBuilder()
+                                .setColor(COLOR_GREEN)
+                                .setTitle("Cat GIF", data.getData().getUrl())
+                                .setDescription("Here is your cat gif!")
+                                .setImage(data.getData().getImageUrl())
+                                .setFooter("Powered by Giphy", "https://img.cerus-dev.de/giphy.gif")
+                                .build()
+                ).complete();
+            } catch (GiphyException ex) {
+                ex.printStackTrace();
+                sendFailure(channel, invoker.getUser(), "Failed to load a gif");
+            }
+        });
 
         new Timer().schedule(new TimerTask() {
             @Override

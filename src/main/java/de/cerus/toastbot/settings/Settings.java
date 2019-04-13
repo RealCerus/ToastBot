@@ -26,6 +26,7 @@ public class Settings {
     private String giphyToken;
     private String dblToken;
     private boolean setPresence;
+    private boolean voteNeededForGifCommand;
 
     public Settings(@Nonnull CommentedFileConfig commentedFileConfig) {
         this.commentedFileConfig = commentedFileConfig;
@@ -53,6 +54,7 @@ public class Settings {
         setCommandPrefix(commentedFileConfig.get("command-prefix"));
         setGiphyToken(commentedFileConfig.get("giphy-api-token"));
         setDblToken(commentedFileConfig.get("discord-bot-list-api-token"));
+        setVoteNeededForGifCommand(commentedFileConfig.get("vote-needed-for-cat-gif"));
     }
 
     public String getDiscordToken() {
@@ -140,5 +142,13 @@ public class Settings {
 
     public void setGiphyToken(String giphyToken) {
         this.giphyToken = giphyToken;
+    }
+
+    public boolean isVoteNeededForGifCommand() {
+        return voteNeededForGifCommand;
+    }
+
+    public void setVoteNeededForGifCommand(boolean voteNeededForGifCommand) {
+        this.voteNeededForGifCommand = voteNeededForGifCommand;
     }
 }

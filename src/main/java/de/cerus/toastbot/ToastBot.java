@@ -13,9 +13,12 @@ import de.cerus.toastbot.commands.terminal.GuildsTCommand;
 import de.cerus.toastbot.commands.terminal.HelpTCommand;
 import de.cerus.toastbot.commands.terminal.ShutdownTCommand;
 import de.cerus.toastbot.commands.user.*;
+import de.cerus.toastbot.economy.EconomyController;
 import de.cerus.toastbot.listeners.GuildListener;
 import de.cerus.toastbot.settings.Settings;
 import de.cerus.toastbot.tasks.ActivityTimerTask;
+import de.cerus.toastbot.tasks.BotChannelSaverTimerTask;
+import de.cerus.toastbot.tasks.StatsTimerTask;
 import de.cerus.toastbot.util.BotChannelUtil;
 import de.cerus.toastbot.util.EmbedUtil;
 import de.cerus.toastbot.util.ImageUtil;
@@ -26,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.io.File;
 import java.util.Timer;
 
 public class ToastBot {
@@ -34,7 +38,9 @@ public class ToastBot {
     private Settings settings;
 
     private Logger logger;
-    private Timer timer;
+    private Timer presenceTimer;
+    private Timer botChannelSaver;
+    private Timer statsTimer;
     private TerminalCommandReader terminalCommandReader;
     private UserCommandReader userCommandReader;
     private DiscordBotListAPI botListAPI;
@@ -45,16 +51,19 @@ public class ToastBot {
         this.logger = LoggerFactory.getLogger(getClass());
         this.terminalCommandReader = new TerminalCommandReader();
         this.userCommandReader = new UserCommandReader(settings);
-        //this.botListAPI = new DiscordBotListAPI.Builder().token(settings.getDblToken()).botId(jda.getSelfUser().getId()).build();
+        this.botListAPI = new DiscordBotListAPI.Builder().token(settings.getDblToken()).botId(jda.getSelfUser().getId()).build();
     }
 
     public void launch() {
         // Load everything
         if (settings.isSetPresence())
-            this.timer = ActivityTimerTask.startNew(jda, settings);
+            this.presenceTimer = ActivityTimerTask.startNew(jda, settings);
         ImageUtil.load();
         EmbedUtil.initialize(settings);
         BotChannelUtil.initialize();
+        this.botChannelSaver = BotChannelSaverTimerTask.startNew();
+        this.statsTimer = StatsTimerTask.createNew(jda, botListAPI);
+        EconomyController economyController = new EconomyController(new File("Economy.toml"));
 
         // Register all commands that can be executed from console
         terminalCommandReader.registerCommands(
@@ -73,7 +82,8 @@ public class ToastBot {
                 new InfoUCommand(),
                 new BotChannelUCommand(),
                 new SetPrefixUCommand(),
-                new CatGifUCommand(botListAPI)
+                new CatGifUCommand(botListAPI),
+                new EconomyUCommand(economyController)
         );
         userCommandReader.start(jda);
 
@@ -92,8 +102,10 @@ public class ToastBot {
     }
 
     public void shutdown() {
-        if (timer != null)
-            timer.cancel();
+        if (presenceTimer != null)
+            presenceTimer.cancel();
+        botChannelSaver.cancel();
+        statsTimer.cancel();
         terminalCommandReader.shutdown();
         userCommandReader.shutdown();
         BotChannelUtil.shutdown();

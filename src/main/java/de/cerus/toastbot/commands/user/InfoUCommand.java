@@ -8,6 +8,7 @@
 package de.cerus.toastbot.commands.user;
 
 import de.cerus.toastbot.command.UserCommand;
+import de.cerus.toastbot.util.AppPropertiesReader;
 import de.cerus.toastbot.util.BotChannelUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -29,7 +30,7 @@ public class InfoUCommand extends UserCommand {
         MessageEmbed messageEmbed = new EmbedBuilder()
                 .setColor(COLOR_BLUE)
                 .setImage(channel.getJDA().getSelfUser().getAvatarUrl())
-                .setTitle("**Toast Bot info**", "https://discord.gg/ddX3eSf")
+                .setTitle("**Toast Bot v"+ AppPropertiesReader.getVersion() +" info**", "https://discord.gg/ddX3eSf")
                 .addField("Bot ID", channel.getJDA().getSelfUser().getId(), false)
                 .addField("Guilds using me", guilds + " guild" + (guilds == 0 || guilds > 1 ? "s" : ""), false)
                 .addField("Creator", channel.getJDA().getUserById(347018538713874444L).getAsMention(), false)

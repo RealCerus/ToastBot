@@ -8,6 +8,7 @@
 package de.cerus.toastbot.tasks;
 
 import de.cerus.toastbot.settings.Settings;
+import de.cerus.toastbot.util.AppPropertiesReader;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.managers.Presence;
@@ -44,11 +45,15 @@ public class ActivityTimerTask extends TimerTask {
                 step++;
                 break;
             case 1:
-                presence.setActivity(Activity.listening(settings.getCommandPrefix()+"<command>"));
+                presence.setActivity(Activity.playing("with a toaster"));
                 step++;
                 break;
             case 2:
-                presence.setActivity(Activity.playing("with a toaster"));
+                presence.setActivity(Activity.listening(settings.getCommandPrefix()+"<command>"));
+                step++;
+                break;
+            case 3:
+                presence.setActivity(Activity.playing("on version "+ AppPropertiesReader.getVersion()));
                 step = 0;
                 break;
         }

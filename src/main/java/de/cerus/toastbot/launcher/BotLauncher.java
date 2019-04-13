@@ -10,6 +10,7 @@ package de.cerus.toastbot.launcher;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import de.cerus.toastbot.ToastBot;
 import de.cerus.toastbot.settings.Settings;
+import de.cerus.toastbot.util.AppPropertiesReader;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import org.slf4j.Logger;
@@ -20,8 +21,6 @@ import java.io.File;
 import java.io.IOException;
 
 public class BotLauncher {
-
-    private final static String VERSION = "0.1.0";
 
     public static void main(String[] args) {
         Logger logger = LoggerFactory.getLogger(BotLauncher.class);
@@ -69,11 +68,13 @@ public class BotLauncher {
         }
         logger.info("JDA is ready!");
 
-        logger.info("Starting Toast Bot v" + VERSION);
+        AppPropertiesReader.initialize();
+
+        logger.info("Starting Toast Bot v" + AppPropertiesReader.getVersion());
         ToastBot bot = new ToastBot(jda, settings);
         bot.launch();
 
-        //Runtime.getRuntime().addShutdownHook(new Thread(bot::shutdown));
+        //Runtime.getRuntime().addShutdownHook(new Thread(bot::saveChannels));
     }
 
     private static void fillDefaults(CommentedFileConfig settings) {
@@ -83,6 +84,7 @@ public class BotLauncher {
         settings.set("giphy-api-token", "<place token here>");
         settings.set("discord-bot-list-api-token", "<place token here>");
         settings.set("command-prefix", "+");
+        settings.set("vote-needed-for-cat-gif", true);
         settings.setComment("giphy-api-token", "You can create a Giphy API token here: https://developers.giphy.com/dashboard/?create=true");
         settings.setComment("discord-bot-token", "You can create a Discord bot token here: https://discordapp.com/developers/applications/");
         settings.setComment("dropbox-api-token", "You can create a DropBox token here: https://www.dropbox.com/developers/apps");
