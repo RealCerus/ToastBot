@@ -28,6 +28,7 @@ public class ToastifyUCommand extends UserCommand {
         super("toastify");
         cooldown = new ArrayList<>();
         setDescription("Shows the percentage of a user of being a toast.");
+        setUsage(getCommand() + " @<user>");
     }
 
     @Override

@@ -25,15 +25,17 @@ public class InfoUCommand extends UserCommand {
     public void execute(String usedCommand, Member invoker, Message message, TextChannel channel, String[] args) {
         if(!BotChannelUtil.isBotChannel(channel.getIdLong())) return;
 
+        int guilds = channel.getJDA().getGuilds().size();
         MessageEmbed messageEmbed = new EmbedBuilder()
                 .setColor(COLOR_BLUE)
                 .setImage(channel.getJDA().getSelfUser().getAvatarUrl())
                 .setTitle("**Toast Bot info**", "https://discord.gg/ddX3eSf")
                 .addField("Bot ID", channel.getJDA().getSelfUser().getId(), false)
-                .addField("Guilds using me", channel.getJDA().getGuilds().size()+" guilds", false)
+                .addField("Guilds using me", guilds + " guild" + (guilds == 0 || guilds > 1 ? "s" : ""), false)
                 .addField("Creator", channel.getJDA().getUserById(347018538713874444L).getAsMention(), false)
                 .addField("Support discord", "https://discord.gg/ddX3eSf", false)
-                .addField("Help", getSettings().getCommandPrefix()+"help", false)
+                .addField("Help", getSettings().getCommandPrefix(channel.getGuild()) + "help", false)
+                .addField("More info", "[Click here](https://discordbots.org/bot/565579372128501776)", false)
                 .build();
         channel.sendMessage(messageEmbed).complete();
     }

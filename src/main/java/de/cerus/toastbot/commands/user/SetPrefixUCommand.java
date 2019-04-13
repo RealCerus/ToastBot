@@ -18,6 +18,7 @@ public class SetPrefixUCommand extends UserCommand {
     public SetPrefixUCommand() {
         super("set-prefix");
         setDescription("Allows admins to change my command prefix for this guild.");
+        setUsage(getCommand() + " <new prefix>");
     }
 
     @Override

@@ -28,6 +28,7 @@ public class ToastUCommand extends UserCommand {
         super("toast");
         cooldown = new ArrayList<>();
         setDescription("'Toasts' a user's avatar or his name.");
+        setUsage(getCommand() + " @<user> [-name]");
     }
 
     @Override

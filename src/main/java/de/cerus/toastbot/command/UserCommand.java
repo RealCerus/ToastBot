@@ -23,6 +23,7 @@ public abstract class UserCommand {
     private String command;
 
     private String description = "";
+    private String usage = "";
     private Settings settings;
 
     public UserCommand(String command) {
@@ -85,5 +86,13 @@ public abstract class UserCommand {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getUsage() {
+        return usage;
+    }
+
+    public void setUsage(String usage) {
+        this.usage = usage;
     }
 }

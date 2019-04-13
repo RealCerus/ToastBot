@@ -18,6 +18,7 @@ public class BotChannelUCommand extends UserCommand {
     public BotChannelUCommand() {
         super("bot-channel");
         setDescription("Allows admins to allow / deny the use of my commands in certain channels.");
+        setUsage(getCommand() + " [add, remove]");
     }
 
     @Override

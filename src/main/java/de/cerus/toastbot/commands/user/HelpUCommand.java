@@ -35,7 +35,7 @@ public class HelpUCommand extends UserCommand {
                 .setDescription("All available commands are listed below.")
                 .setFooter("Requested by " + invoker.getUser().getAsTag(), invoker.getUser().getAvatarUrl());
         String commandPrefix = getSettings().getCommandPrefix(channel.getGuild());
-        commandReader.getCommands().forEach(userCommand -> builder.addField(commandPrefix+userCommand.getCommand(), userCommand.getDescription(), false));
+        commandReader.getCommands().forEach(userCommand -> builder.addField(commandPrefix + (userCommand.getUsage().equals("") ? userCommand.getCommand() : userCommand.getUsage()), userCommand.getDescription(), false));
         channel.sendMessage(builder.build()).complete();
     }
 }
