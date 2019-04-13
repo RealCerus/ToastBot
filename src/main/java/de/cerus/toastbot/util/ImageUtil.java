@@ -17,7 +17,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -33,10 +32,10 @@ public class ImageUtil {
     private static Font breadFont = new Font("bread", Font.PLAIN, 30);
 
     public static BufferedImage getAvatarImage(User user, int width) {
-        if (user.getAvatarUrl() == null) return null;
+        if (user.getAvatarUrl() == null && user.getDefaultAvatarUrl() == null) return null;
 
         try {
-            java.net.URL url = new URL(user.getAvatarUrl() + "?size=" + width);
+            java.net.URL url = new URL((user.getAvatarUrl() == null ? user.getDefaultAvatarUrl() : user.getAvatarUrl()) + "?size=" + width);
             URLConnection connection = url.openConnection();
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
 
@@ -57,7 +56,7 @@ public class ImageUtil {
             graphics.drawImage(temporary, 0, 0, null);
             graphics.dispose();
 
-            return bufferedImage;
+            return scale(bufferedImage, 128, 128);
             //ImageIO.write(bufferedImage, "png", new File("./output.png"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -91,23 +90,23 @@ public class ImageUtil {
             int newStringWitdh = graphics.getFontMetrics(font).stringWidth(s) + miniToastImage.getWidth();
             graphics.drawString(s, (wheatFieldImage.getWidth() / 2) - newStringWitdh / 2, (wheatFieldImage.getHeight() / 2) + avatar.getHeight() + 5);
             // Drawing our toast icon next to the text
-            graphics.drawImage(miniToastImage, ((wheatFieldImage.getWidth() / 2) + (stringWitdh / 2)), (wheatFieldImage.getHeight() / 2) + avatar.getHeight()-30, null);
+            graphics.drawImage(miniToastImage, ((wheatFieldImage.getWidth() / 2) + (stringWitdh / 2)), (wheatFieldImage.getHeight() / 2) + avatar.getHeight() - 30, null);
 
             // Drawing the background of the 'progress bar'
             graphics.setColor(Color.GRAY);
             int rectX = 15;
-            int rectY = (wheatFieldImage.getHeight()/5);
-            int rectWidth = (wheatFieldImage.getWidth())-30;
+            int rectY = (wheatFieldImage.getHeight() / 5);
+            int rectWidth = (wheatFieldImage.getWidth()) - 30;
             int rectHeight = 10;
             graphics.fillRect(rectX, rectY, rectWidth, rectHeight);
 
             // Drawing the actual content of the 'progress bar'
             graphics.setColor(Color.LIGHT_GRAY);
-            rectY+=1;
-            rectX+=1;
-            rectHeight-=2;
-            rectWidth-=2;
-            rectWidth = (rectWidth/100)*percent;
+            rectY += 1;
+            rectX += 1;
+            rectHeight -= 2;
+            rectWidth -= 2;
+            rectWidth = (rectWidth / 100) * percent;
             graphics.fillRect(rectX, rectY, rectWidth, rectHeight);
 
             // Dispose the graphics object because we don't need it anymore
@@ -185,11 +184,22 @@ public class ImageUtil {
         }
     }
 
+    private static BufferedImage scale(BufferedImage imageToScale, int dWidth, int dHeight) {
+        BufferedImage scaledImage = null;
+        if (imageToScale != null) {
+            scaledImage = new BufferedImage(dWidth, dHeight, imageToScale.getType());
+            Graphics2D graphics2D = scaledImage.createGraphics();
+            graphics2D.drawImage(imageToScale, 0, 0, dWidth, dHeight, null);
+            graphics2D.dispose();
+        }
+        return scaledImage;
+    }
+
     public static void load() {
         GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
         try {
             File fontFile = new File("./yummy_bread.ttf");
-            if(!fontFile.exists()){
+            if (!fontFile.exists()) {
                 FileUtils.copyURLToFile(new java.net.URL("http://cerus-dev.de/dl/toastbot/yummy_bread.ttf"), fontFile);
             }
             graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("./yummy_bread.ttf")));
@@ -200,7 +210,7 @@ public class ImageUtil {
         if (!toast.exists()) {
             try {
                 InputStream stream = BotLauncher.class.getClassLoader().getResourceAsStream("toast.jpg");
-                if(stream == null)
+                if (stream == null)
                     stream = BotLauncher.class.getClassLoader().getResourceAsStream("/toast.jpg");
                 Files.copy(stream, toast.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
@@ -211,7 +221,7 @@ public class ImageUtil {
         if (!wheatField.exists()) {
             try {
                 InputStream stream = BotLauncher.class.getClassLoader().getResourceAsStream("wheat_field.jpg");
-                if(stream == null)
+                if (stream == null)
                     stream = BotLauncher.class.getClassLoader().getResourceAsStream("/wheat_field.jpg");
                 Files.copy(stream, wheatField.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
@@ -222,7 +232,7 @@ public class ImageUtil {
         if (!miniToast.exists()) {
             try {
                 InputStream stream = BotLauncher.class.getClassLoader().getResourceAsStream("mini_toast.gif");
-                if(stream == null)
+                if (stream == null)
                     stream = BotLauncher.class.getClassLoader().getResourceAsStream("/mini_toast.gif");
                 Files.copy(stream, miniToast.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {

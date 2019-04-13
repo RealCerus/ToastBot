@@ -32,6 +32,12 @@ public class EconomyUCommand extends UserCommand {
         if(isInGuild == null)
             isInGuild = channel.getJDA().getGuilds().stream().filter(guild -> guild.getId().equals("565825337108463626")).iterator().hasNext();
 
+        if(args.length == 1 && message.getMentionedMembers().size() == 1){
+            Member member = message.getMentionedMembers().get(0);
+            sendMessage(channel, invoker.getUser(), COLOR_GREEN, member.getUser().getAsTag()+"'s breadcrumbs", member.getAsMention()+"'s breadcrumbs: **"+economyController.getBreadcrumbs(member)+"** "+getEmoji(channel.getJDA()));
+            return;
+        }
+
         sendMessage(channel, invoker.getUser(), COLOR_GREEN, "Your breadcrumbs", "Your breadcrumbs: **"+economyController.getBreadcrumbs(invoker)+"** "+getEmoji(channel.getJDA()));
     }
 

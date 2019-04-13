@@ -128,7 +128,8 @@ public class EmbedUtil {
 
     public static void sendToastify(User user, TextChannel channel) {
         // 'Generating' the percent
-        int percent = ThreadLocalRandom.current().nextInt(1, 101);
+        String id = user.getId();
+        int percent = (user.getName().toLowerCase().contains("toast") ? 100 : Integer.valueOf(id.substring(id.length()/3, (id.length()/3)+2)));
 
         // Sending the message with the generated percent
         Message message = channel.sendMessage(

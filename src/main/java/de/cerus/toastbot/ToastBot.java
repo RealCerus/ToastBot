@@ -83,7 +83,8 @@ public class ToastBot {
                 new BotChannelUCommand(),
                 new SetPrefixUCommand(),
                 new CatGifUCommand(botListAPI),
-                new EconomyUCommand(economyController)
+                new EconomyUCommand(economyController),
+                new SearchGifUCommand()
         );
         userCommandReader.start(jda);
 
