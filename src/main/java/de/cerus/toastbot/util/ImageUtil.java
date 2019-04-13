@@ -224,7 +224,7 @@ public class ImageUtil {
                 InputStream stream = BotLauncher.class.getClassLoader().getResourceAsStream("mini_toast.gif");
                 if(stream == null)
                     stream = BotLauncher.class.getClassLoader().getResourceAsStream("/mini_toast.gif");
-                Files.copy(stream, wheatField.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(stream, miniToast.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 e.printStackTrace();
             }
