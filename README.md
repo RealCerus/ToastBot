@@ -1,3 +1,5 @@
+![GitHub Releases](https://img.shields.io/github/downloads/RealCerus/ToastBot/0.1.0/total.svg?style=flat-square) ![Discord](https://img.shields.io/discord/565825337108463626.svg?style=flat-square) ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/RealCerus/ToastBot.svg?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/RealCerus/ToastBot.svg?style=flat-square)
+\
 # Toast Bot
 Toast Bot is a neat Discord bot that brings a little bit of fun to your guild.
 Invite the bot now: [Click here](https://discordapp.com/api/oauth2/authorize?client_id=566437783527227402&permissions=60416&scope=bot)
