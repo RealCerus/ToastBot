@@ -7,6 +7,8 @@
 
 package de.cerus.toastbot;
 
+import at.mukprojects.giphy4j.Giphy;
+import de.cerus.toastbot.command.SendThanksTCommand;
 import de.cerus.toastbot.command.TerminalCommandReader;
 import de.cerus.toastbot.command.UserCommandReader;
 import de.cerus.toastbot.commands.terminal.GuildsTCommand;
@@ -14,14 +16,15 @@ import de.cerus.toastbot.commands.terminal.HelpTCommand;
 import de.cerus.toastbot.commands.terminal.ShutdownTCommand;
 import de.cerus.toastbot.commands.user.*;
 import de.cerus.toastbot.economy.EconomyController;
+import de.cerus.toastbot.event.VoteEventCaller;
 import de.cerus.toastbot.listeners.GuildListener;
+import de.cerus.toastbot.listeners.ReactionListener;
 import de.cerus.toastbot.settings.Settings;
 import de.cerus.toastbot.tasks.ActivityTimerTask;
 import de.cerus.toastbot.tasks.BotChannelSaverTimerTask;
 import de.cerus.toastbot.tasks.StatsTimerTask;
-import de.cerus.toastbot.util.BotChannelUtil;
-import de.cerus.toastbot.util.EmbedUtil;
-import de.cerus.toastbot.util.ImageUtil;
+import de.cerus.toastbot.tasks.VoteCheckerRunnable;
+import de.cerus.toastbot.util.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.discordbots.api.client.DiscordBotListAPI;
@@ -44,6 +47,10 @@ public class ToastBot {
     private TerminalCommandReader terminalCommandReader;
     private UserCommandReader userCommandReader;
     private DiscordBotListAPI botListAPI;
+    private Thread voteChecker;
+    private VoteCheckerRunnable voteCheckerRunnable;
+    private VoteEventCaller voteEventCaller;
+    private EconomyController economyController;
 
     public ToastBot(@Nonnull JDA jda, @Nonnull Settings settings) {
         this.jda = jda;
@@ -52,6 +59,7 @@ public class ToastBot {
         this.terminalCommandReader = new TerminalCommandReader();
         this.userCommandReader = new UserCommandReader(settings);
         this.botListAPI = new DiscordBotListAPI.Builder().token(settings.getDblToken()).botId(jda.getSelfUser().getId()).build();
+        this.voteEventCaller = new VoteEventCaller();
     }
 
     public void launch() {
@@ -63,13 +71,29 @@ public class ToastBot {
         BotChannelUtil.initialize();
         this.botChannelSaver = BotChannelSaverTimerTask.startNew();
         this.statsTimer = StatsTimerTask.createNew(jda, botListAPI);
-        EconomyController economyController = new EconomyController(new File("Economy.toml"));
+        economyController = new EconomyController(new File("./Economy.toml"));
+        Giphy giphy = new Giphy(settings.getGiphyToken());
+        EmoteUtil.initialize(jda);
+        VoteUtil.initialize(economyController, giphy);
+        startVoteCheck();
+
+        voteEventCaller.registerListener((member, guild) -> {
+            economyController.addBreadcrumbs(member, 5);
+            try {
+                member.getUser().openPrivateChannel().complete().sendMessage(
+                        VoteUtil.getThankYouMessage(member.getUser())
+                ).complete();
+            } catch (Exception ignored) {
+                System.out.println("failed to send dm");
+            }
+        });
 
         // Register all commands that can be executed from console
         terminalCommandReader.registerCommands(
                 new HelpTCommand(terminalCommandReader),
                 new GuildsTCommand(jda),
-                new ShutdownTCommand(this)
+                new ShutdownTCommand(this)/*,
+                new SendThanksTCommand(jda) <- This command should be used for testing only */
         );
         terminalCommandReader.start();
 
@@ -82,15 +106,17 @@ public class ToastBot {
                 new InfoUCommand(),
                 new BotChannelUCommand(),
                 new SetPrefixUCommand(),
-                new CatGifUCommand(botListAPI),
+                new CatGifUCommand(botListAPI, giphy),
                 new EconomyUCommand(economyController),
-                new SearchGifUCommand()
+                new SearchGifUCommand(giphy),
+                new VoteUCommand()
         );
         userCommandReader.start(jda);
 
         // Register listener adapters
         registerEventListeners(
-                new GuildListener(settings)
+                new GuildListener(settings),
+                new ReactionListener(userCommandReader, settings)
         );
 
         logger.info("The launch of Toast Bot is now complete.");
@@ -102,14 +128,27 @@ public class ToastBot {
         }
     }
 
+    public void startVoteCheck(){
+        voteCheckerRunnable = new VoteCheckerRunnable(jda, botListAPI, voteEventCaller);
+        voteChecker = new Thread(voteCheckerRunnable);
+        voteChecker.start();
+    }
+
     public void shutdown() {
         if (presenceTimer != null)
             presenceTimer.cancel();
         botChannelSaver.cancel();
         statsTimer.cancel();
+        if(voteCheckerRunnable != null){
+            voteCheckerRunnable.setInterrupted(true);
+            voteCheckerRunnable.shutdown();
+        }
+        if(voteChecker != null)
+            voteChecker.interrupt();
         terminalCommandReader.shutdown();
         userCommandReader.shutdown();
         BotChannelUtil.shutdown();
+        economyController.shutdown();
 
         jda.shutdown();
     }

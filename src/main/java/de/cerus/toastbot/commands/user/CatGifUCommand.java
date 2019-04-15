@@ -12,6 +12,7 @@ import at.mukprojects.giphy4j.entity.search.SearchRandom;
 import at.mukprojects.giphy4j.exception.GiphyException;
 import de.cerus.toastbot.command.UserCommand;
 import de.cerus.toastbot.util.BotChannelUtil;
+import de.cerus.toastbot.util.VoteUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -30,18 +31,13 @@ public class CatGifUCommand extends UserCommand {
     private DiscordBotListAPI botListAPI;
     private Giphy giphy;
 
-    public CatGifUCommand(DiscordBotListAPI botListAPI) {
+    public CatGifUCommand(DiscordBotListAPI botListAPI, Giphy giphy) {
         super("cat-gif");
+        this.giphy = giphy;
         setDescription("Sends a random cat gif from Giphy.");
         this.cooldown = new ArrayList<>();
         this.botListAPI = botListAPI;
     }
-
-    @Override
-    public void onRegistration() {
-        this.giphy = new Giphy(getSettings().getGiphyToken());
-    }
-
     @Override
     public void execute(String usedCommand, Member invoker, Message message, TextChannel channel, String[] args) {
         if (!BotChannelUtil.isBotChannel(channel.getIdLong())) return;
@@ -55,21 +51,18 @@ public class CatGifUCommand extends UserCommand {
         }
         cooldown.add(invoker.getIdLong());
 
-        botListAPI.hasVoted(invoker.getId()).whenComplete((hasVoted, e) -> {
-            if(getSettings().isVoteNeededForGifCommand()){
-                if(e != null) {
-                    sendFailure(channel, invoker.getUser(), "Failed to verify your vote. Please try again later.");
-                    return;
-                }
-                if(!hasVoted){
-                    sendFailure(channel, invoker.getUser(), "This command is for voters only! Vote [here](https://discordbots.org/bot/565579372128501776)");
-                    return;
-                }
-            }
 
+        if (!VoteUtil.getHasVoted().getOrDefault(invoker.getIdLong(), false) && getSettings().isVoteNeededForGifCommand()) {
+            sendFailure(channel, invoker.getUser(), "This command is for voters only! Type `" + getSettings().getCommandPrefix(channel.getGuild()) + "vote` to learn more");
+            return;
+        }
+
+        Message firstMessage = sendMessage(channel, invoker.getUser(), COLOR_GREEN, "Searching...", "Please wait while I'm searching for a cat gif!");
+
+        new Thread(() -> {
             try {
                 SearchRandom data = giphy.searchRandom("cat");
-                channel.sendMessage(
+                firstMessage.editMessage(
                         new EmbedBuilder()
                                 .setColor(COLOR_GREEN)
                                 .setTitle("Cat GIF", data.getData().getUrl())
@@ -80,9 +73,9 @@ public class CatGifUCommand extends UserCommand {
                 ).complete();
             } catch (GiphyException ex) {
                 ex.printStackTrace();
-                sendFailure(channel, invoker.getUser(), "Failed to load a gif");
+                firstMessage.editMessage(buildFailure(invoker.getUser(), "Failed to load a gif")).complete();
             }
-        });
+        }).start();
 
         new Timer().schedule(new TimerTask() {
             @Override

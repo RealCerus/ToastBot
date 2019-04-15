@@ -9,10 +9,12 @@ package de.cerus.toastbot.command;
 
 import de.cerus.toastbot.settings.Settings;
 import de.cerus.toastbot.util.BotChannelUtil;
+import de.cerus.toastbot.util.HelpPagination;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
@@ -32,11 +34,13 @@ public class UserCommandReader {
     private JDA jda;
     private ListenerAdapter listenerAdapter;
     private Settings settings;
+    private HelpPagination helpPagination;
 
     public UserCommandReader(Settings settings) {
         this.settings = settings;
         commands = new ArrayList<>();
         logger = LoggerFactory.getLogger(getClass());
+        this.helpPagination = new HelpPagination(4);
     }
 
     public void start(JDA jda) {
@@ -44,9 +48,18 @@ public class UserCommandReader {
         listenerAdapter = new ListenerAdapter() {
             @Override
             public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+                if(event.getMember() == null) return;
+                if(event.getMember().getUser() == null) return;
+                if(event.getMember().getUser().isBot()) return;
                 String contentRaw = event.getMessage().getContentRaw();
-                if(!settings.startsWithCommandPrefix(contentRaw)) return;
+                if(!settings.startsWithCommandPrefix(contentRaw) && !contentRaw.startsWith(event.getJDA().getSelfUser().getAsMention())) return;
+                if(contentRaw.trim().equals(event.getJDA().getSelfUser().getAsMention()) && BotChannelUtil.isBotChannel(event.getChannel().getIdLong())){
+                    execute("info", event.getMember(), event.getMessage());
+                    return;
+                }
                 contentRaw = settings.removeCommandPrefix(contentRaw);
+                if(contentRaw.startsWith(event.getJDA().getSelfUser().getAsMention()))
+                    contentRaw = contentRaw.substring(event.getJDA().getSelfUser().getAsMention().length()).trim();
                 boolean success = execute(contentRaw, event.getMember(), event.getMessage());
                 if(!success && BotChannelUtil.isBotChannel(event.getChannel().getIdLong()))
                     event.getChannel().sendMessage(
@@ -71,6 +84,7 @@ public class UserCommandReader {
         for (UserCommand command : commands) {
             command.setSettings(settings);
             this.commands.add(command);
+            helpPagination.add(new MessageEmbed.Field((command.getUsage().equals("") ? command.getCommand() : command.getUsage()), command.getDescription(), false));
             command.onRegistration();
         }
     }
@@ -89,5 +103,9 @@ public class UserCommandReader {
         commands.forEach(userCommand -> userCommand.execute(command, member, message, message.getTextChannel(), args));
 
         return !commands.isEmpty();
+    }
+
+    public HelpPagination getHelpPagination() {
+        return helpPagination;
     }
 }

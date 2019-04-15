@@ -32,7 +32,7 @@ public class StatsTimerTask extends TimerTask {
     @Override
     public void run() {
         try {
-            discordBotListAPI.setStats(jda.getGuilds().size());
+            //discordBotListAPI.setStats(jda.getGuilds().size());
         } catch (Exception ignored){
         }
     }

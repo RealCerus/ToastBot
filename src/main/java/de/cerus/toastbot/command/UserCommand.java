@@ -9,10 +9,7 @@ package de.cerus.toastbot.command;
 
 import de.cerus.toastbot.settings.Settings;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 
 public abstract class UserCommand {
 
@@ -35,30 +32,38 @@ public abstract class UserCommand {
     public void onRegistration() {
     }
 
-    public void sendFailure(TextChannel channel, User user, String message) {
-        channel.sendMessage(
-                new EmbedBuilder()
-                        .setColor(COLOR_RED)
-                        .setTitle("Error")
-                        .setDescription(message)
-                        .setFooter(user.getAsTag(), user.getAvatarUrl())
-                        .build()
+    public Message sendFailure(TextChannel channel, User user, String message) {
+        return channel.sendMessage(
+                buildFailure(user, message)
         ).complete();
     }
 
-    public void sendSuccess(TextChannel channel, User user, String message) {
-        channel.sendMessage(
-                new EmbedBuilder()
-                        .setColor(COLOR_GREEN)
-                        .setTitle("Success")
-                        .setDescription(message)
-                        .setFooter(user.getAsTag(), user.getAvatarUrl())
-                        .build()
+    public MessageEmbed buildFailure(User user, String message){
+        return new EmbedBuilder()
+                .setColor(COLOR_RED)
+                .setTitle("Error")
+                .setDescription(message)
+                .setFooter(user.getAsTag(), user.getAvatarUrl())
+                .build();
+    }
+
+    public Message sendSuccess(TextChannel channel, User user, String message) {
+        return channel.sendMessage(
+                buildSuccess(user, message)
         ).complete();
     }
 
-    public void sendMessage(TextChannel channel, User user, int color, String title, String message) {
-        channel.sendMessage(
+    public MessageEmbed buildSuccess(User user, String message){
+        return new EmbedBuilder()
+                .setColor(COLOR_GREEN)
+                .setTitle("Success")
+                .setDescription(message)
+                .setFooter(user.getAsTag(), user.getAvatarUrl())
+                .build();
+    }
+
+    public Message sendMessage(TextChannel channel, User user, int color, String title, String message) {
+        return channel.sendMessage(
                 new EmbedBuilder()
                         .setColor(color)
                         .setTitle(title)

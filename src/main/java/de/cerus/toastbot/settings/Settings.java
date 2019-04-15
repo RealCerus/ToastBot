@@ -10,6 +10,7 @@ package de.cerus.toastbot.settings;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.SelfUser;
 
 import javax.annotation.Nonnull;
 import java.io.File;
