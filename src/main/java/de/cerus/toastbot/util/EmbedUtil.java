@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -67,9 +68,10 @@ public class EmbedUtil {
                 try {
                     metadata = client.files().uploadBuilder("/" + toastFile.getName()).uploadAndFinish(inputStream);
                     link = client.files().getTemporaryLink(metadata.getPathDisplay()).getLink();
-                } catch (BadRequestException ignored) {
+                } catch (BadRequestException e) {
                     link = null;
                     metadata = null;
+                    e.printStackTrace();
                 }
 
                 // Trying to edit the message to add the download link and the generated image
@@ -93,7 +95,8 @@ public class EmbedUtil {
                         ).complete();
                         message.getChannel().sendFile(toastFile).complete();
                     }
-                } catch (ErrorResponseException ignored) {
+                } catch (ErrorResponseException e) {
+                    e.printStackTrace();
                 }
 
                 if (link == null) return;
@@ -118,7 +121,8 @@ public class EmbedUtil {
                                     .setDescription("Here is the toasted version of " + user.getAsTag() + ":\n*[Link removed]*")
                                     .build()
                     ).complete();
-                } catch (ErrorResponseException ignored) {
+                } catch (ErrorResponseException e) {
+                    e.printStackTrace();
                 }
             } catch (IOException | DbxException | InterruptedException e) {
                 e.printStackTrace();

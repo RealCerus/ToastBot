@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019 Cerus
+  ~ File created at 16.04.19 10:59
+  ~ Last modification: 16.04.19 10:59
+  ~ All rights reserved.
+  -->
+
+<Configuration status="WARN">
+
+    <Appenders>
+        <!-- By default => console -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <param name="Threshold" value="ERROR" />
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <File name="File" fileName="./some-log.txt">
+            <PatternLayout>
+                <pattern>%d %p %C{1.} [%t] %m%n</pattern>
+            </PatternLayout>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <Root level="error">
+            <AppenderRef ref="File" level="error"/>
+            <AppenderRef ref="File" level="info"/>
+            <AppenderRef ref="File" level="warn"/>
+            <AppenderRef ref="File" level="fatal"/>
+            <AppenderRef ref="Console" level="error"/>
+            <AppenderRef ref="Console" level="info"/>
+            <AppenderRef ref="Console" level="warn"/>
+            <AppenderRef ref="Console" level="fatal"/>
+        </Root>
+    </Loggers>
+</Configuration>

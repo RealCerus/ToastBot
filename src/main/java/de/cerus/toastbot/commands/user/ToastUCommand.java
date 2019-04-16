@@ -10,6 +10,7 @@ package de.cerus.toastbot.commands.user;
 import de.cerus.toastbot.command.UserCommand;
 import de.cerus.toastbot.util.BotChannelUtil;
 import de.cerus.toastbot.util.EmbedUtil;
+import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;

@@ -27,12 +27,15 @@ import de.cerus.toastbot.tasks.VoteCheckerRunnable;
 import de.cerus.toastbot.util.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.discordbots.api.client.DiscordBotListAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Timer;
 
 public class ToastBot {
@@ -77,14 +80,17 @@ public class ToastBot {
         VoteUtil.initialize(economyController, giphy);
         startVoteCheck();
 
+        // Register the only vote listener
         voteEventCaller.registerListener((member, guild) -> {
+            System.out.print("[Vote] " + member.getUser().getAsTag() + " voted");
             economyController.addBreadcrumbs(member, 5);
             try {
                 member.getUser().openPrivateChannel().complete().sendMessage(
                         VoteUtil.getThankYouMessage(member.getUser())
                 ).complete();
+                System.out.println("\n");
             } catch (Exception ignored) {
-                System.out.println("failed to send dm");
+                System.out.print(" | failed to send DM\n");
             }
         });
 
@@ -92,8 +98,8 @@ public class ToastBot {
         terminalCommandReader.registerCommands(
                 new HelpTCommand(terminalCommandReader),
                 new GuildsTCommand(jda),
-                new ShutdownTCommand(this)/*,
-                new SendThanksTCommand(jda) <- This command should be used for testing only */
+                new ShutdownTCommand(this),
+                new SendThanksTCommand(jda)/* <- This command should be used for testing only */
         );
         terminalCommandReader.start();
 
@@ -128,7 +134,7 @@ public class ToastBot {
         }
     }
 
-    public void startVoteCheck(){
+    public void startVoteCheck() {
         voteCheckerRunnable = new VoteCheckerRunnable(jda, botListAPI, voteEventCaller);
         voteChecker = new Thread(voteCheckerRunnable);
         voteChecker.start();
@@ -139,11 +145,11 @@ public class ToastBot {
             presenceTimer.cancel();
         botChannelSaver.cancel();
         statsTimer.cancel();
-        if(voteCheckerRunnable != null){
+        if (voteCheckerRunnable != null) {
             voteCheckerRunnable.setInterrupted(true);
             voteCheckerRunnable.shutdown();
         }
-        if(voteChecker != null)
+        if (voteChecker != null)
             voteChecker.interrupt();
         terminalCommandReader.shutdown();
         userCommandReader.shutdown();
