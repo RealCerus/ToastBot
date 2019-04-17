@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 public class VoteUCommand extends UserCommand {
     public VoteUCommand() {
         super("vote");
+        setDescription("Shows the vote link and some information.");
     }
 
     @Override
