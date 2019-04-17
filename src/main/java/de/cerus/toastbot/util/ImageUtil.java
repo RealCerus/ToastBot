@@ -29,13 +29,15 @@ public class ImageUtil {
     private static File toast = new File("./toast.jpg");
     private static File miniToast = new File("./mini_toast.gif");
     private static File wheatField = new File("./wheat_field.jpg");
+    private static File fireImage = new File("./fire.jpg");
+    private static File lightningImage = new File("./lightning.png");
     private static Font breadFont = new Font("bread", Font.PLAIN, 30);
 
     public static BufferedImage getAvatarImage(User user, int width) {
         if (user.getAvatarUrl() == null && user.getDefaultAvatarUrl() == null) return null;
 
         try {
-            java.net.URL url = new URL((user.getAvatarUrl() == null ? user.getDefaultAvatarUrl() : user.getAvatarUrl()) + "?size=" + width);
+            java.net.URL url = new URL((user.getAvatarUrl() == null ? user.getDefaultAvatarUrl() : user.getAvatarUrl()) + "?size=128");
             URLConnection connection = url.openConnection();
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
 
@@ -56,7 +58,7 @@ public class ImageUtil {
             graphics.drawImage(temporary, 0, 0, null);
             graphics.dispose();
 
-            return scale(bufferedImage, 128, 128);
+            return scale(bufferedImage, width, width);
             //ImageIO.write(bufferedImage, "png", new File("./output.png"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -184,6 +186,47 @@ public class ImageUtil {
         }
     }
 
+    public static File toastBatlle(User userOne, User userTwo) {
+        try {
+            // Reading the background image
+            BufferedImage fire = ImageIO.read(fireImage);
+            // Reading the lightning image
+            BufferedImage lightning = ImageIO.read(lightningImage);
+
+            // Get the avatar's
+            BufferedImage userOneAvatar = getAvatarImage(userOne, 256);
+            BufferedImage userTwoAvatar = getAvatarImage(userTwo, 256);
+
+            // Getting the graphics object and setting all preferences
+            Graphics graphics = fire.getGraphics();
+
+            int oneThird = fire.getWidth()/3;
+            int xOne = (fire.getWidth()/2)-oneThird-(userOneAvatar.getWidth()/2);
+            int xTwo = (fire.getWidth()/2)+oneThird-(userTwoAvatar.getWidth()/2);
+            int y = (fire.getHeight()/2)-(256/2);
+            int xLightning = (fire.getWidth()/2)-(lightning.getWidth()/2);
+            int yLightning = (fire.getHeight()/2)-(lightning.getHeight()/2);
+
+            // Draw all images
+            graphics.drawImage(lightning, xLightning, yLightning, null);
+            graphics.drawImage(userOneAvatar, xOne, y, null);
+            graphics.drawImage(userTwoAvatar, xTwo, y, null);
+
+            graphics.dispose();
+
+            File directory = new File("./toastbattle-images/");
+            directory.mkdirs();
+            File savedImage = new File(directory, "toastbattle-" + userOne.getId() + "-" + userTwo.getId() + "-" + System.currentTimeMillis() + ".png");
+
+            // Saving the generated image to use it later
+            ImageIO.write(fire, "png", savedImage);
+            return savedImage;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private static BufferedImage scale(BufferedImage imageToScale, int dWidth, int dHeight) {
         BufferedImage scaledImage = null;
         if (imageToScale != null) {
@@ -235,6 +278,28 @@ public class ImageUtil {
                 if (stream == null)
                     stream = BotLauncher.class.getClassLoader().getResourceAsStream("/mini_toast.gif");
                 Files.copy(stream, miniToast.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!fireImage.exists()) {
+            try {
+                InputStream stream = BotLauncher.class.getClassLoader().getResourceAsStream("fire.jpg");
+                if (stream == null)
+                    stream = BotLauncher.class.getClassLoader().getResourceAsStream("/fire.jpg");
+                Files.copy(stream, fireImage.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!lightningImage.exists()) {
+            try {
+                InputStream stream = BotLauncher.class.getClassLoader().getResourceAsStream("lightning.png");
+                if (stream == null)
+                    stream = BotLauncher.class.getClassLoader().getResourceAsStream("/lightning.png");
+                Files.copy(stream, lightningImage.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 e.printStackTrace();
             }

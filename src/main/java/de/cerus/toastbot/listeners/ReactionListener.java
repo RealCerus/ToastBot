@@ -43,6 +43,7 @@ public class ReactionListener extends ListenerAdapter {
         }
         if(history.isEmpty()) return;
         Message message = history.getMessageById(event.getMessageId());
+        if(message.getAuthor().getIdLong() != event.getJDA().getSelfUser().getIdLong()) return;
         if(message.getEmbeds().size() != 1) return;
         MessageEmbed messageEmbed = message.getEmbeds().get(0);
         MessageEmbed.Footer footer = messageEmbed.getFooter();

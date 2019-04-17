@@ -115,7 +115,8 @@ public class ToastBot {
                 new CatGifUCommand(botListAPI, giphy),
                 new EconomyUCommand(economyController),
                 new SearchGifUCommand(giphy),
-                new VoteUCommand()
+                new VoteUCommand(),
+                new ToastBattleUCommand()
         );
         userCommandReader.start(jda);
 

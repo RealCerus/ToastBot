@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -130,10 +129,192 @@ public class EmbedUtil {
         }).start();
     }
 
+    public static void sendToastBattle(User userOne, User userTwo, TextChannel channel) {
+        if (client == null) return;
+
+        // Do this stuff in another thread to avoid blocking
+        new Thread(() -> {
+            // Generate the toastbattle image thing
+            File battleImage = ImageUtil.toastBatlle(userOne, userTwo);
+
+            // Send an error message in case the generated file is somehow null
+            if (battleImage == null) {
+                channel.sendMessage(
+                        new EmbedBuilder()
+                                .setColor(13632027)
+                                .setTitle("Error", "https://cerus-dev.de/")
+                                .setDescription("Failed to do a battle between " + userOne.getAsTag() + " and " + userTwo.getAsTag())
+                                .build()
+                ).complete();
+                return;
+            }
+
+            // Sending the message stating the image is being generated
+            Message message = channel.sendMessage(
+                    new EmbedBuilder()
+                            .setColor(8311585)
+                            .setTitle("Starting battle", "https://cerus-dev.de/")
+                            .setDescription("Starting the toast battle between " + userOne.getAsTag() + " and " + userTwo.getAsTag() + "...")
+                            .build()
+            ).complete();
+
+            // Try-with-resources to upload the image and send it to the user
+            try (InputStream inputStream = new FileInputStream(battleImage)) {
+                // Uploading the image
+                String link;
+                FileMetadata metadata;
+                try {
+                    metadata = client.files().uploadBuilder("/" + battleImage.getName()).uploadAndFinish(inputStream);
+                    link = client.files().getTemporaryLink(metadata.getPathDisplay()).getLink();
+                } catch (BadRequestException e) {
+                    link = null;
+                    metadata = null;
+                    e.printStackTrace();
+                }
+
+                // Trying to edit the message to add the download link and the generated image
+                try {
+                    if (link != null) {
+                        message.editMessage(
+                                new EmbedBuilder()
+                                        .setColor(8311585)
+                                        .setTitle("Toast battle", "https://cerus-dev.de/")
+                                        .setDescription("Battle started!")
+                                        .addField(userOne.getAsTag(), "**100** HP", true)
+                                        .addField(userTwo.getAsTag(), "**100** HP", true)
+                                        .setImage(link)
+                                        .build()
+                        ).complete();
+                        Thread.sleep(3000);
+                        battle(message, 100, 100, userOne, userTwo, link);
+                    } else {
+                        message.editMessage(
+                                new EmbedBuilder()
+                                        .setColor(8311585)
+                                        .setTitle("Toast battle", "https://cerus-dev.de/")
+                                        .setDescription("Battle started!")
+                                        .addField(userOne.getAsTag(), "**100** HP", true)
+                                        .addField(userTwo.getAsTag(), "**100** HP", true)
+                                        .build()
+                        ).complete();
+                        message.getChannel().sendFile(battleImage).complete();
+                        Thread.sleep(3000);
+                        battle(message, 100, 100, userOne, userTwo, "http://some.link");
+                        message.getChannel().sendFile(battleImage).complete();
+                    }
+                } catch (ErrorResponseException e) {
+                    e.printStackTrace();
+                }
+
+                if (link == null) return;
+                // Waiting five minutes to delete the image and remove the download link
+                Thread.sleep((10 * 60) * 1000);
+
+                // Deleting the uploaded image so we don't waste any DropBox storage space
+                try {
+                    client.files().deleteV2(metadata.getPathDisplay());
+                    if (battleImage.exists())
+                        // Deleting the saved file so we don't waste any disk space
+                        battleImage.delete();
+                } catch (DeleteErrorException ignored) {
+                }
+
+                try {
+                    // Trying to delete the message
+                    message.editMessage(
+                            new EmbedBuilder(message.getEmbeds().get(0)).setImage("http://no.image").build()
+                    ).complete();
+                } catch (ErrorResponseException e) {
+                    e.printStackTrace();
+                }
+            } catch (IOException | DbxException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private static void battle(Message message, int userOneHP, int userTwoHP, User userOne, User userTwo, String image) {
+        boolean userOneStarts = ThreadLocalRandom.current().nextBoolean();
+        String pun = randomPun().replace("{user1}", userOneStarts ? userOne.getAsTag() : userTwo.getAsTag()).replace("{user2}", !userOneStarts ? userOne.getAsTag() : userTwo.getAsTag());
+        int damage = ThreadLocalRandom.current().nextInt(4, 17);
+        int newHPUserOne = (userOneStarts ? userOneHP : userOneHP - damage);
+        int newHPUserTwo = (userOneStarts ? userTwoHP - damage : userTwoHP);
+        if(pun.endsWith(" <TOAST BOOST ACTIVATED>")){
+            if(userOneStarts)
+                newHPUserTwo+=50;
+            else newHPUserOne+=50;
+        }
+        if (newHPUserOne < 0) newHPUserOne = 0;
+        if (newHPUserTwo < 0) newHPUserTwo = 0;
+
+        boolean someoneWon = newHPUserOne <= 0 || newHPUserTwo <= 0;
+        boolean userOneWon = newHPUserTwo <= 0;
+
+        if (someoneWon) {
+            try {
+                message.editMessage(new EmbedBuilder()
+                        .setColor(8311585)
+                        .setTitle("Toast battle", "https://cerus-dev.de/")
+                        .setDescription(pun+"\n**" + (userOneWon ? userOne.getAsTag() : userTwo.getAsTag()) + " won the battle!**")
+                        .addField(userOne.getAsTag(), "**" + newHPUserOne + "** HP", true)
+                        .addField(userTwo.getAsTag(), "**" + newHPUserTwo + "** HP", true)
+                        .setImage(image)
+                        .build()
+                ).complete();
+            } catch (Exception ignored) {
+            }
+            return;
+        }
+
+        try {
+            message.editMessage(new EmbedBuilder()
+                    .setColor(8311585)
+                    .setTitle("Toast battle", "https://cerus-dev.de/")
+                    .setDescription(pun)
+                    .addField(userOne.getAsTag(), "**" + newHPUserOne + "** HP", true)
+                    .addField(userTwo.getAsTag(), "**" + newHPUserTwo + "** HP", true)
+                    .setImage(image)
+                    .build()
+            ).complete();
+            Thread.sleep(5000);
+            battle(message, newHPUserOne, newHPUserTwo, userOne, userTwo, image);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private static String randomPun() {
+        switch (ThreadLocalRandom.current().nextInt(0, 10)) {
+            case 0:
+                if(ThreadLocalRandom.current().nextBoolean() && ThreadLocalRandom.current().nextInt(0, 10) == 5)
+                    return "{user2} saw a wild <@325957450807115776>! <TOAST BOOST ACTIVATED>";
+                else return "{user2} fell asleep!";
+            case 1:
+                return "{user2} accidentally hit himself / herself!";
+            case 2:
+                return "{user2} got somehow confused!";
+            case 3:
+                return "{user2} burned his tongue on freshly baked bread!";
+            case 4:
+                return "{user1} stabbed {user2} with a sharp piece of bread!";
+            case 5:
+                return "{user1} poisoned {user2} with poisoned bread!";
+            case 6:
+                return "{user2} tripped on a loaf of bread!";
+            case 7:
+                return "{user2} slipped on breadcrumbs!";
+            case 8:
+                return "A box of bread fell onto {user2}!";
+            case 9:
+                return "{user2} got beaten by a loaf of bread!";
+            default:
+                return "{user1} slapped {user2} with a bag of breadcrumbs!";
+        }
+    }
+
     public static void sendToastify(User user, TextChannel channel) {
         // 'Generating' the percent
         String id = user.getId();
-        int percent = (user.getName().toLowerCase().contains("toast") ? 100 : Integer.valueOf(id.substring(id.length()/3, (id.length()/3)+2)));
+        int percent = (user.getName().toLowerCase().contains("toast") ? 100 : Integer.valueOf(id.substring(id.length() / 3, (id.length() / 3) + 2)));
 
         // Sending the message with the generated percent
         Message message = channel.sendMessage(

@@ -38,6 +38,7 @@ public class CreditsUCommand extends UserCommand {
                 .addField("File host", "Using [DropBox](https://dropbox.com/) to host the generated images", false)
                 .addField("Gifs", "Using the gifs available at [Giphy](https://giphy.com/)", false)
                 .addField("Tester & Helper", channel.getJDA().getUserById(325957450807115776L).getAsMention()+", "+channel.getJDA().getUserById(332142165402714113L).getAsMention(), false)
+                .addField("Server provider", channel.getJDA().getUserById(332142165402714113L).getAsMention(), false)
                 .build();
         channel.sendMessage(builder).complete();
     }
