@@ -40,7 +40,7 @@ public class CatGifUCommand extends UserCommand {
     }
     @Override
     public void execute(String usedCommand, Member invoker, Message message, TextChannel channel, String[] args) {
-        if (!BotChannelUtil.isBotChannel(channel.getIdLong())) {
+        if (!BotChannelUtil.isBotChannel(channel)) {
             sendNoCommandChannelFailure(channel, invoker.getUser());
             return;
         }
