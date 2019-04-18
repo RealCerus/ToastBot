@@ -24,7 +24,10 @@ public class InfoUCommand extends UserCommand {
 
     @Override
     public void execute(String usedCommand, Member invoker, Message message, TextChannel channel, String[] args) {
-        if (!BotChannelUtil.isBotChannel(channel.getIdLong())) return;
+        if (!BotChannelUtil.isBotChannel(channel.getIdLong())) {
+            sendNoCommandChannelFailure(channel, invoker.getUser());
+            return;
+        }
 
         int guilds = channel.getJDA().getGuilds().size();
         MessageEmbed messageEmbed = new EmbedBuilder()

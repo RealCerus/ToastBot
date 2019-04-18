@@ -23,7 +23,10 @@ public class CreditsUCommand extends UserCommand {
 
     @Override
     public void execute(String usedCommand, Member invoker, Message message, TextChannel channel, String[] args) {
-        if(!BotChannelUtil.isBotChannel(channel.getIdLong())) return;
+        if (!BotChannelUtil.isBotChannel(channel.getIdLong())) {
+            sendNoCommandChannelFailure(channel, invoker.getUser());
+            return;
+        }
 
         MessageEmbed builder = new EmbedBuilder()
                 .setColor(COLOR_BLUE)

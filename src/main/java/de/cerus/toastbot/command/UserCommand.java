@@ -11,6 +11,9 @@ import de.cerus.toastbot.settings.Settings;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public abstract class UserCommand {
 
     protected static int COLOR_GREEN = 8311585;
@@ -30,6 +33,20 @@ public abstract class UserCommand {
     public abstract void execute(String usedCommand, Member invoker, Message message, TextChannel channel, String[] args);
 
     public void onRegistration() {
+    }
+
+    public void sendNoCommandChannelFailure(TextChannel channel, User user){
+        Message message = sendFailure(channel, user, "Commands can only be used in command channels. If you believe this is an error please contact an admin.");
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    message.delete().complete();
+                } catch (Exception ignored){
+                }
+            }
+        }, 8000);
     }
 
     public Message sendFailure(TextChannel channel, User user, String message) {

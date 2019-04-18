@@ -30,7 +30,10 @@ public class EconomyUCommand extends UserCommand {
 
     @Override
     public void execute(String usedCommand, Member invoker, Message message, TextChannel channel, String[] args) {
-        if (!BotChannelUtil.isBotChannel(channel.getIdLong())) return;
+        if (!BotChannelUtil.isBotChannel(channel.getIdLong())) {
+            sendNoCommandChannelFailure(channel, invoker.getUser());
+            return;
+        }
 
         if (args.length == 1) {
             if(message.getMentionedMembers().size() == 1){

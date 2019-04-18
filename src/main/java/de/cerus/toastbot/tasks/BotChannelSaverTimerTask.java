@@ -22,16 +22,10 @@ public class BotChannelSaverTimerTask extends TimerTask {
         return timer;
     }
 
-
-    private List<Long> previousBotChannels = new ArrayList<>();
-
     @Override
     public void run() {
         System.out.println("Trying to save bot channels...");
-        if (!BotChannelUtil.getBotChannels().equals(previousBotChannels)){
-            BotChannelUtil.saveChannels();
-            System.out.println("Saved bot channels");
-        } else System.out.println("Bot channels haven't changed, abort");
-        previousBotChannels = BotChannelUtil.getBotChannels();
+        BotChannelUtil.saveChannels();
+        System.out.println("Saved bot channels");
     }
 }

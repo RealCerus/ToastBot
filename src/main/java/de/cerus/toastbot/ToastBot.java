@@ -82,12 +82,12 @@ public class ToastBot {
         startVoteCheck();
 
         // Register the only vote listener
-        voteEventCaller.registerListener((member, guild) -> {
+        voteEventCaller.registerListener((member, guild, isWeekend) -> {
             System.out.print("[Vote] " + member.getUser().getAsTag() + " voted");
-            economyController.addBreadcrumbs(member, 5);
+            economyController.addBreadcrumbs(member, isWeekend ? 10 : 5);
             try {
                 member.getUser().openPrivateChannel().complete().sendMessage(
-                        VoteUtil.getThankYouMessage(member.getUser())
+                        VoteUtil.getThankYouMessage(member.getUser(), isWeekend)
                 ).complete();
                 System.out.println("\n");
             } catch (Exception ignored) {

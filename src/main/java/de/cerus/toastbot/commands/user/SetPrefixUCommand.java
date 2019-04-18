@@ -23,7 +23,10 @@ public class SetPrefixUCommand extends UserCommand {
 
     @Override
     public void execute(String usedCommand, Member invoker, Message message, TextChannel channel, String[] args) {
-        if(!BotChannelUtil.isBotChannel(channel.getIdLong())) return;
+        if (!BotChannelUtil.isBotChannel(channel.getIdLong())) {
+            sendNoCommandChannelFailure(channel, invoker.getUser());
+            return;
+        }
 
         if(!invoker.hasPermission(Permission.MANAGE_CHANNEL)){
             sendFailure(channel, invoker.getUser(), "Sorry, it seems like you don't have the required permissions (Manage channels) for this action.");

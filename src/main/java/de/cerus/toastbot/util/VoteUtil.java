@@ -38,12 +38,12 @@ public class VoteUtil {
         VoteUtil.hasVoted = hasVoted;
     }
 
-    public static MessageEmbed getThankYouMessage(User member) {
+    public static MessageEmbed getThankYouMessage(User member, Boolean isWeekend) {
         return new EmbedBuilder()
                 .setTitle("Thanks for your vote")
                 .setColor(Color.magenta)
                 .setDescription("Thanks for voting for this bot at [DiscordBots.org](https://discordbots.org)! " +
-                        "You received 5 " + EmoteUtil.getBreadcrumbEmote() + ". Total " + EmoteUtil.getBreadcrumbEmote() + ": " + economyController.getBreadcrumbs(member))
+                        "You received "+(isWeekend ? "**10 (weekend bonus)**" : "5")+" " + EmoteUtil.getBreadcrumbEmote() + ". Total " + EmoteUtil.getBreadcrumbEmote() + ": " + economyController.getBreadcrumbs(member))
                 .setImage(randomThankYouGif())
                 .build();
     }

@@ -57,7 +57,10 @@ public class GuildListener extends ListenerAdapter {
         try {
             owner.openPrivateChannel().complete().sendMessage(messageEmbed).complete();
         } catch (Exception ignored) {
-            guild.getSystemChannel().sendMessage(messageEmbed).complete();
+            try {
+                guild.getSystemChannel().sendMessage(messageEmbed).complete();
+            } catch (Exception ignored1){
+            }
         }
     }
 

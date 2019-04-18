@@ -186,7 +186,7 @@ public class EmbedUtil {
                                         .build()
                         ).complete();
                         Thread.sleep(3000);
-                        battle(message, 100, 100, userOne, userTwo, link);
+                        battle(message, 100, 100, userOne, userTwo, link, metadata.getPathDisplay() == null ? "" : metadata.getPathDisplay(), battleImage);
                     } else {
                         message.editMessage(
                                 new EmbedBuilder()
@@ -199,14 +199,14 @@ public class EmbedUtil {
                         ).complete();
                         message.getChannel().sendFile(battleImage).complete();
                         Thread.sleep(3000);
-                        battle(message, 100, 100, userOne, userTwo, "http://some.link");
+                        battle(message, 100, 100, userOne, userTwo, "http://some.link", metadata == null ? "" : metadata.getPathDisplay(), battleImage);
                         message.getChannel().sendFile(battleImage).complete();
                     }
                 } catch (ErrorResponseException e) {
                     e.printStackTrace();
                 }
 
-                if (link == null) return;
+/*                if (link == null) return;
                 // Waiting five minutes to delete the image and remove the download link
                 Thread.sleep((10 * 60) * 1000);
 
@@ -220,20 +220,20 @@ public class EmbedUtil {
                 }
 
                 try {
-                    // Trying to delete the message
+                    // Trying to edit the message
                     message.editMessage(
-                            new EmbedBuilder(message.getEmbeds().get(0)).setImage("http://no.image").build()
+                            new EmbedBuilder(message.getEmbeds().get(message.getEmbeds().size()-1)).setImage("http://no.image").build()
                     ).complete();
                 } catch (ErrorResponseException e) {
                     e.printStackTrace();
-                }
+                }*/
             } catch (IOException | DbxException | InterruptedException e) {
                 e.printStackTrace();
             }
         }).start();
     }
 
-    private static void battle(Message message, int userOneHP, int userTwoHP, User userOne, User userTwo, String image) {
+    private static void battle(Message message, int userOneHP, int userTwoHP, User userOne, User userTwo, String link, String image, File battleImage) {
         boolean userOneStarts = ThreadLocalRandom.current().nextBoolean();
         String pun = randomPun().replace("{user1}", userOneStarts ? userOne.getAsTag() : userTwo.getAsTag()).replace("{user2}", !userOneStarts ? userOne.getAsTag() : userTwo.getAsTag());
         int damage = ThreadLocalRandom.current().nextInt(4, 17);
@@ -251,16 +251,40 @@ public class EmbedUtil {
         boolean userOneWon = newHPUserTwo <= 0;
 
         if (someoneWon) {
+            EmbedBuilder builder = new EmbedBuilder()
+                    .setColor(8311585)
+                    .setTitle("Toast battle", "https://cerus-dev.de/")
+                    .setDescription(pun+"\n**" + (userOneWon ? userOne.getAsTag() : userTwo.getAsTag()) + " won the battle!**")
+                    .addField(userOne.getAsTag(), "**" + newHPUserOne + "** HP", true)
+                    .addField(userTwo.getAsTag(), "**" + newHPUserTwo + "** HP", true)
+                    .setImage(link);
             try {
-                message.editMessage(new EmbedBuilder()
-                        .setColor(8311585)
-                        .setTitle("Toast battle", "https://cerus-dev.de/")
-                        .setDescription(pun+"\n**" + (userOneWon ? userOne.getAsTag() : userTwo.getAsTag()) + " won the battle!**")
-                        .addField(userOne.getAsTag(), "**" + newHPUserOne + "** HP", true)
-                        .addField(userTwo.getAsTag(), "**" + newHPUserTwo + "** HP", true)
-                        .setImage(image)
-                        .build()
+                message.editMessage(
+                        builder.build()
                 ).complete();
+
+                if (link == null) return;
+                // Waiting five minutes to delete the image and remove the download link
+                Thread.sleep((10 * 60) * 1000);
+
+                // Deleting the uploaded image so we don't waste any DropBox storage space
+                try {
+                    if(!image.equals(""))
+                        client.files().deleteV2(image);
+                    if (battleImage.exists())
+                        // Deleting the saved file so we don't waste any disk space
+                        battleImage.delete();
+                } catch (DeleteErrorException ignored) {
+                }
+
+                try {
+                    // Trying to edit the message
+                    message.editMessage(
+                            builder.setImage("http://no.image").build()
+                    ).complete();
+                } catch (ErrorResponseException e) {
+                    e.printStackTrace();
+                }
             } catch (Exception ignored) {
             }
             return;
@@ -273,11 +297,11 @@ public class EmbedUtil {
                     .setDescription(pun)
                     .addField(userOne.getAsTag(), "**" + newHPUserOne + "** HP", true)
                     .addField(userTwo.getAsTag(), "**" + newHPUserTwo + "** HP", true)
-                    .setImage(image)
+                    .setImage(link)
                     .build()
             ).complete();
             Thread.sleep(5000);
-            battle(message, newHPUserOne, newHPUserTwo, userOne, userTwo, image);
+            battle(message, newHPUserOne, newHPUserTwo, userOne, userTwo, link, image, battleImage);
         } catch (Exception ignored) {
         }
     }
