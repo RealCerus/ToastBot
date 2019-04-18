@@ -3,7 +3,8 @@
 # Toast Bot
 Toast Bot is a neat Discord bot that brings a little bit of fun to your guild.\
 Invite the bot now: [Click here](https://discordapp.com/oauth2/authorize?client_id=565579372128501776&permissions=125952&scope=bot)\
-Join the support Discord: [Click here](https://discord.gg/ddX3eSf)
+Join the support Discord: [Click here](https://discord.gg/ddX3eSf)\
+[![Discord Bots](https://discordbots.org/api/widget/565579372128501776.svg)](https://discordbots.org/bot/565579372128501776)
 
 ## Features
 The bot features a few commands (and more are to come):
