@@ -18,6 +18,7 @@ import de.cerus.toastbot.commands.user.*;
 import de.cerus.toastbot.economy.EconomyController;
 import de.cerus.toastbot.event.VoteEventCaller;
 import de.cerus.toastbot.listeners.GuildListener;
+import de.cerus.toastbot.listeners.PrivateChannelListener;
 import de.cerus.toastbot.listeners.ReactionListener;
 import de.cerus.toastbot.settings.Settings;
 import de.cerus.toastbot.tasks.ActivityTimerTask;
@@ -123,7 +124,8 @@ public class ToastBot {
         // Register listener adapters
         registerEventListeners(
                 new GuildListener(settings),
-                new ReactionListener(userCommandReader, settings)
+                new ReactionListener(userCommandReader, settings),
+                new PrivateChannelListener(terminalCommandReader)
         );
 
         logger.info("The launch of Toast Bot is now complete.");

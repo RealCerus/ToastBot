@@ -8,7 +8,6 @@
 package de.cerus.toastbot.tasks;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import de.cerus.toastbot.commands.user.VoteUCommand;
 import de.cerus.toastbot.event.VoteEventCaller;
 import de.cerus.toastbot.util.VoteUtil;
 import net.dv8tion.jda.api.JDA;
@@ -18,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class VoteCheckerRunnable implements Runnable {
     private JDA jda;
@@ -34,7 +34,7 @@ public class VoteCheckerRunnable implements Runnable {
         this.voteEventCaller = voteEventCaller;
 
         File file = new File("./Voters.toml");
-        if(!file.exists()){
+        if (!file.exists()) {
             try {
                 file.createNewFile();
             } catch (IOException e) {
@@ -44,7 +44,7 @@ public class VoteCheckerRunnable implements Runnable {
 
         this.voterConfig = CommentedFileConfig.of(file);
         this.voterConfig.load();
-        if(this.voterConfig.isEmpty()){
+        if (this.voterConfig.isEmpty()) {
             this.voterConfig.set("voters", new ArrayList<Long>());
             this.voterConfig.save();
         }
@@ -56,37 +56,37 @@ public class VoteCheckerRunnable implements Runnable {
 
     @Override
     public void run() {
-        new ArrayList<>(jda.getGuilds()).forEach(guild -> new ArrayList<>(guild.getMembers()).stream().filter(member -> !member.getUser().isBot()).forEach(member -> {
-            if(isInterrupted()) return;
+        new ArrayList<>(jda.getGuilds().stream().filter(guild -> !guild.getId().equals(/*DBL Guild: */"264445053596991498")).collect(Collectors.toList())).forEach(guild -> new ArrayList<>(guild.getMembers()).stream().filter(member -> !member.getUser().isBot()).forEach(member -> {
+            if (isInterrupted()) return;
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException ignored) {
             }
             discordBotListAPI.hasVoted(member.getId()).whenComplete((hasVoted, throwable) -> {
-                if(throwable != null){
-                } else if(hasVoted && !voters.contains(member.getIdLong())){
+                if (throwable != null) {
+                } else if (hasVoted && !voters.contains(member.getIdLong())) {
                     VoteUtil.getHasVoted().put(member.getIdLong(), true);
-                   voters.add(member.getIdLong());
-                   voteEventCaller.call(member, guild);
-               } else if(!hasVoted && voters.contains(member.getIdLong())){
+                    voters.add(member.getIdLong());
+                    voteEventCaller.call(member, guild);
+                } else if (!hasVoted && voters.contains(member.getIdLong())) {
                     VoteUtil.getHasVoted().put(member.getIdLong(), false);
-                   voters.remove(member.getIdLong());
-               }
+                    voters.remove(member.getIdLong());
+                }
             });
         }));
-        if(isInterrupted()) return;
+        if (isInterrupted()) return;
         try {
-            Thread.sleep((2*60)*1000);
+            Thread.sleep((2 * 60) * 1000);
             run();
         } catch (InterruptedException ignored) {
         }
     }
 
-    public void shutdown(){
+    public void shutdown() {
         saveVoters();
     }
 
-    public void saveVoters(){
+    public void saveVoters() {
         this.voterConfig.set("voters", voters);
         this.voterConfig.save();
     }
