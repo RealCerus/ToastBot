@@ -28,7 +28,7 @@ The `toastify` command will generate an image like this:\
 ![Image](https://img.cerus-dev.de/toastify_cmd_prev.png)\
 The `search-gif` command will search for 5 gifs matching your search query.
 
-##Help
+## Help
 See the [FAQ](https://github.com/RealCerus/ToastBot/blob/master/FAQ.md)
 
 ## Setup
