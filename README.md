@@ -17,12 +17,19 @@ The bot features a few commands (and more are to come):
 - toast
 - toastify
 - cat-gif
+- economy
+- search-gif
+- vote
 
 The default command prefix is `+`.\
 The `toast` command will generate an image like this:\
 ![Image](https://img.cerus-dev.de/toast_cmd_prev.png)\
 The `toastify` command will generate an image like this:\
 ![Image](https://img.cerus-dev.de/toastify_cmd_prev.png)\
+The `search-gif` command will search for 5 gifs matching your search query.
+
+##Help
+See the [FAQ](https://github.com/RealCerus/ToastBot/blob/master/FAQ.md)
 
 ## Setup
 You can find the bot at DiscordBots.org: [Click here](https://discordbots.org/bot/565579372128501776)
@@ -31,7 +38,7 @@ There's also a self hosted version, but we'll talk about that later on.
 \
 \
 After you invited the bot to your guild you need to set one (or more) bot channels in order to use the commands.
-Type `+bot-channel add` in a text channel of your choice to register it as a bot channel. You can type `+bot-channel remove` to unregister it.
+Type `+bot-channel add` in a text channel of your choice to register it as a bot channel or put "[Bot Channel]" in the channel topic / description. You can type `+bot-channel remove` to unregister it.
 \
 You are also able to change the command prefix for your guild. Just type `+set-prefix <new prefix>` in the previously registered bot channel to change it.
 

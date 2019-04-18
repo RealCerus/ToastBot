@@ -8,6 +8,7 @@
 package de.cerus.toastbot.util;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +49,12 @@ public class BotChannelUtil {
 
     public static boolean isBotChannel(Long id) {
         return botChannels.contains(id);
+    }
+
+    public static boolean isBotChannel(TextChannel channel) {
+        if(channel.getTopic().toLowerCase().contains("[bot channel]"))
+            return true;
+        return isBotChannel(channel.getIdLong());
     }
 
     public static void shutdown(){

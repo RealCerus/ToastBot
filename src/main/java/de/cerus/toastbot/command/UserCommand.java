@@ -36,7 +36,8 @@ public abstract class UserCommand {
     }
 
     public void sendNoCommandChannelFailure(TextChannel channel, User user){
-        Message message = sendFailure(channel, user, "Commands can only be used in command channels. If you believe this is an error please contact an admin.");
+        Message message = sendFailure(channel, user, "Commands can only be used in command channels. " +
+                "If you believe this is an error please contact an admin. More info can be found [here](https://github.com/RealCerus/ToastBot/blob/master/FAQ.md#no-command-works)");
 
         new Timer().schedule(new TimerTask() {
             @Override

@@ -38,7 +38,7 @@ public class GuildListener extends ListenerAdapter {
                 .setImage(guild.getJDA().getSelfUser().getAvatarUrl())
                 .setDescription("Hi! I'm Toast Bot. In order to use me you need to set at least one bot channel. " +
                         "To do that, go into a text channel and type `" + settings.getCommandPrefix(guild) + "bot-channel add` " +
-                        "(Note: You need the 'Manage channels' permission!). Now you and your members can use my commands! " +
+                        "(Note: You need the 'Manage channels' permission!). You can alternatively add `[Bot Channel]` to your channel topic / description. Now you and your members can use my commands! " +
                         ":bread:\nOh, I forgot to tell you something: Did you know you can change my command prefix for your " +
                         "guild? Type `" + settings.getCommandPrefix(guild) + "set-prefix <new prefix>` to change it (Requires 'Manage channels' permission)!")
                 .build();
