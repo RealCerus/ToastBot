@@ -85,6 +85,7 @@ public class BotLauncher {
         settings.set("discord-bot-list-api-token", "<place token here>");
         settings.set("command-prefix", "+");
         settings.set("vote-needed-for-cat-gif", true);
+        settings.set("command-log", true);
         settings.setComment("giphy-api-token", "You can create a Giphy API token here: https://developers.giphy.com/dashboard/?create=true");
         settings.setComment("discord-bot-token", "You can create a Discord bot token here: https://discordapp.com/developers/applications/");
         settings.setComment("dropbox-api-token", "You can create a DropBox token here: https://www.dropbox.com/developers/apps");

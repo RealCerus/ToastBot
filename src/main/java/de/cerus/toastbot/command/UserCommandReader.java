@@ -61,6 +61,8 @@ public class UserCommandReader {
                 if(contentRaw.startsWith(event.getJDA().getSelfUser().getAsMention()))
                     contentRaw = contentRaw.substring(event.getJDA().getSelfUser().getAsMention().length()).trim();
                 boolean success = execute(contentRaw, event.getMember(), event.getMessage());
+                if(success && settings.isCommandLog())
+                    System.out.println("[Command log] "+event.getMember().getUser().getAsTag()+" in "+event.getGuild().getName()+": "+contentRaw);
                 if(!success && BotChannelUtil.isBotChannel(event.getChannel().getIdLong()))
                     event.getChannel().sendMessage(
                             new EmbedBuilder()
