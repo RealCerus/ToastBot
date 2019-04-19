@@ -43,7 +43,7 @@ public class VoteUtil {
                 .setTitle("Thanks for your vote")
                 .setColor(Color.magenta)
                 .setDescription("Thanks for voting for this bot at [DiscordBots.org](https://discordbots.org)! " +
-                        "You received "+(isWeekend ? "**10 (weekend bonus)**" : "5")+" " + EmoteUtil.getBreadcrumbEmote() + ". Total " + EmoteUtil.getBreadcrumbEmote() + ": " + economyController.getBreadcrumbs(member))
+                        "You received "+(isWeekend ? "**20 (weekend bonus)**" : "10")+" " + EmoteUtil.getBreadcrumbEmote() + ". Total " + EmoteUtil.getBreadcrumbEmote() + ": " + economyController.getBreadcrumbs(member))
                 .setImage(randomThankYouGif())
                 .build();
     }

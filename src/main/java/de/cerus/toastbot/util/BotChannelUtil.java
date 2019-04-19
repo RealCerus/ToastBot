@@ -52,7 +52,8 @@ public class BotChannelUtil {
     }
 
     public static boolean isBotChannel(TextChannel channel) {
-        if(channel.getTopic().toLowerCase().contains("[bot channel]"))
+        if(channel == null) return false;
+        if(channel.getTopic() != null && channel.getTopic().toLowerCase().contains("[bot channel]"))
             return true;
         return isBotChannel(channel.getIdLong());
     }

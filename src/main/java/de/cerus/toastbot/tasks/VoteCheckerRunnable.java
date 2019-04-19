@@ -57,12 +57,12 @@ public class VoteCheckerRunnable implements Runnable {
 
     @Override
     public void run() {
-        AtomicBoolean isWeekend = new AtomicBoolean(false);
+/*        AtomicBoolean isWeekend = new AtomicBoolean(false);
         discordBotListAPI.getVotingMultiplier().whenComplete((votingMultiplier, throwable) -> {
             if(throwable != null)
                 isWeekend.set(votingMultiplier.isWeekend());
         });
-        new ArrayList<>(jda.getGuilds().stream().filter(guild -> !guild.getId().equals(/*DBL Guild: */"264445053596991498")).collect(Collectors.toList())).forEach(guild -> new ArrayList<>(guild.getMembers()).stream().filter(member -> !member.getUser().isBot()).forEach(member -> {
+        new ArrayList<>(jda.getGuilds().stream().filter(guild -> !guild.getId().equals(*//*DBL Guild: *//*"264445053596991498")).collect(Collectors.toList())).forEach(guild -> new ArrayList<>(guild.getMembers()).stream().filter(member -> !member.getUser().isBot()).forEach(member -> {
             if (isInterrupted()) return;
             try {
                 Thread.sleep(5000);
@@ -86,7 +86,7 @@ public class VoteCheckerRunnable implements Runnable {
             saveVoters();
             run();
         } catch (InterruptedException ignored) {
-        }
+        }*/
     }
 
     public void shutdown() {

@@ -23,7 +23,7 @@ public class EconomyUCommand extends UserCommand {
 
     public EconomyUCommand(EconomyController economyController) {
         super("economy");
-        setDescription("Shows your breadcrumbs. This command is currently useless and you currently cant gain breadcrumbs.");
+        setDescription("Shows your breadcrumbs.");
         setUsage(getCommand()+" [@<user>, top]");
         this.economyController = economyController;
     }

@@ -11,8 +11,8 @@ import at.mukprojects.giphy4j.Giphy;
 import at.mukprojects.giphy4j.entity.search.SearchRandom;
 import at.mukprojects.giphy4j.exception.GiphyException;
 import de.cerus.toastbot.command.UserCommand;
+import de.cerus.toastbot.economy.EconomyController;
 import de.cerus.toastbot.util.BotChannelUtil;
-import de.cerus.toastbot.util.VoteUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -30,10 +30,12 @@ public class CatGifUCommand extends UserCommand {
     private List<Long> cooldown;
     private DiscordBotListAPI botListAPI;
     private Giphy giphy;
+    private EconomyController economyController;
 
-    public CatGifUCommand(DiscordBotListAPI botListAPI, Giphy giphy) {
+    public CatGifUCommand(DiscordBotListAPI botListAPI, Giphy giphy, EconomyController economyController) {
         super("cat-gif");
         this.giphy = giphy;
+        this.economyController = economyController;
         setDescription("Sends a random cat gif from Giphy.");
         this.cooldown = new ArrayList<>();
         this.botListAPI = botListAPI;
@@ -56,8 +58,8 @@ public class CatGifUCommand extends UserCommand {
         cooldown.add(invoker.getIdLong());
 
 
-        if (!VoteUtil.getHasVoted().getOrDefault(invoker.getIdLong(), false) && getSettings().isVoteNeededForGifCommand()) {
-            sendFailure(channel, invoker.getUser(), "This command is for voters only! Type `" + getSettings().getCommandPrefix(channel.getGuild()) + "vote` to learn more");
+        if (economyController.getBreadcrumbs(invoker) <= 0) {
+            sendFailure(channel, invoker.getUser(), "You do not have enough breadcrumbs! One cat gif costs 1 breadcrumb. Type `" + getSettings().getCommandPrefix(channel.getGuild()) + "vote` to learn how to earn breadcrumbs!");
             return;
         }
 
@@ -70,11 +72,12 @@ public class CatGifUCommand extends UserCommand {
                         new EmbedBuilder()
                                 .setColor(COLOR_GREEN)
                                 .setTitle("Cat GIF", data.getData().getUrl())
-                                .setDescription("Here is your cat gif!")
+                                .setDescription("Here is your cat gif!\n*(-1 breadcrumb)*")
                                 .setImage(data.getData().getImageUrl())
                                 .setFooter("Powered by Giphy", "https://img.cerus-dev.de/giphy.gif")
                                 .build()
                 ).complete();
+                economyController.removeBreadcrumbs(invoker, 1);
             } catch (GiphyException ex) {
                 ex.printStackTrace();
                 firstMessage.editMessage(buildFailure(invoker.getUser(), "Failed to load a gif")).complete();

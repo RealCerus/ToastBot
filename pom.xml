@@ -80,6 +80,13 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-core</artifactId>
+            <version>2.0.20.Final</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
             <version>4.ALPHA.0_70</version>

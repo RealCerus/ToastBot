@@ -20,6 +20,7 @@ import de.cerus.toastbot.event.VoteEventCaller;
 import de.cerus.toastbot.listeners.GuildListener;
 import de.cerus.toastbot.listeners.PrivateChannelListener;
 import de.cerus.toastbot.listeners.ReactionListener;
+import de.cerus.toastbot.server.WebServer;
 import de.cerus.toastbot.settings.Settings;
 import de.cerus.toastbot.tasks.ActivityTimerTask;
 import de.cerus.toastbot.tasks.BotChannelSaverTimerTask;
@@ -28,15 +29,12 @@ import de.cerus.toastbot.tasks.VoteCheckerRunnable;
 import de.cerus.toastbot.util.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.requests.RestAction;
 import org.discordbots.api.client.DiscordBotListAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Timer;
 
 public class ToastBot {
@@ -55,6 +53,7 @@ public class ToastBot {
     private VoteCheckerRunnable voteCheckerRunnable;
     private VoteEventCaller voteEventCaller;
     private EconomyController economyController;
+    private WebServer webServer;
 
     public ToastBot(@Nonnull JDA jda, @Nonnull Settings settings) {
         this.jda = jda;
@@ -64,6 +63,7 @@ public class ToastBot {
         this.userCommandReader = new UserCommandReader(settings);
         this.botListAPI = new DiscordBotListAPI.Builder().token(settings.getDblToken()).botId(jda.getSelfUser().getId()).build();
         this.voteEventCaller = new VoteEventCaller();
+        this.webServer = new WebServer(voteEventCaller, settings, jda);
     }
 
     public void launch() {
@@ -82,12 +82,12 @@ public class ToastBot {
         startVoteCheck();
 
         // Register the only vote listener
-        voteEventCaller.registerListener((member, guild, isWeekend) -> {
-            System.out.print("[Vote] " + member.getUser().getAsTag() + " voted");
-            economyController.addBreadcrumbs(member, isWeekend ? 10 : 5);
+        voteEventCaller.registerListener((user, isWeekend) -> {
+            System.out.print("[Vote] " + user.getAsTag() + " voted");
+            economyController.addBreadcrumbs(user, isWeekend ? 20 : 10);
             try {
-                member.getUser().openPrivateChannel().complete().sendMessage(
-                        VoteUtil.getThankYouMessage(member.getUser(), isWeekend)
+                user.openPrivateChannel().complete().sendMessage(
+                        VoteUtil.getThankYouMessage(user, isWeekend)
                 ).complete();
                 System.out.println("\n");
             } catch (Exception ignored) {
@@ -113,7 +113,7 @@ public class ToastBot {
                 new InfoUCommand(),
                 new BotChannelUCommand(),
                 new SetPrefixUCommand(),
-                new CatGifUCommand(botListAPI, giphy),
+                new CatGifUCommand(botListAPI, giphy, economyController),
                 new EconomyUCommand(economyController),
                 new SearchGifUCommand(giphy),
                 new VoteUCommand(),
@@ -138,9 +138,10 @@ public class ToastBot {
     }
 
     public void startVoteCheck() {
-        voteCheckerRunnable = new VoteCheckerRunnable(jda, botListAPI, voteEventCaller);
+        /*voteCheckerRunnable = new VoteCheckerRunnable(jda, botListAPI, voteEventCaller);
         voteChecker = new Thread(voteCheckerRunnable);
-        voteChecker.start();
+        voteChecker.start();*/
+        webServer.start();
     }
 
     public void shutdown() {
@@ -157,6 +158,7 @@ public class ToastBot {
         terminalCommandReader.shutdown();
         userCommandReader.shutdown();
         BotChannelUtil.shutdown();
+        webServer.shutdown();
         economyController.shutdown();
 
         jda.shutdown();

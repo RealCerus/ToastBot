@@ -26,6 +26,7 @@ public class Settings {
     private String commandPrefix;
     private String giphyToken;
     private String dblToken;
+    private String dblVoteAuth;
     private boolean setPresence;
     private boolean voteNeededForGifCommand;
     private boolean commandLog;
@@ -58,6 +59,7 @@ public class Settings {
         setDblToken(commentedFileConfig.get("discord-bot-list-api-token"));
         setVoteNeededForGifCommand(commentedFileConfig.get("vote-needed-for-cat-gif"));
         setCommandLog(commentedFileConfig.get("command-log"));
+        setDblVoteAuth(commentedFileConfig.get("vote-token"));
     }
 
     public String getDiscordToken() {
@@ -161,5 +163,13 @@ public class Settings {
 
     public void setCommandLog(boolean commandLog) {
         this.commandLog = commandLog;
+    }
+
+    public String getDblVoteAuth() {
+        return dblVoteAuth;
+    }
+
+    public void setDblVoteAuth(String dblVoteAuth) {
+        this.dblVoteAuth = dblVoteAuth;
     }
 }
