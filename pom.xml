@@ -13,7 +13,7 @@
 
     <groupId>de.cerus</groupId>
     <artifactId>ToastBot</artifactId>
-    <version>0.1.5</version>
+    <version>0.1.6</version>
 
     <build>
         <plugins>
@@ -114,6 +114,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.11.2</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.electronwill.night-config</groupId>
             <artifactId>toml</artifactId>
             <version>3.5.2</version>
@@ -145,6 +152,13 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.6</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.RealCerus</groupId>
+            <artifactId>DBLWebhookAPI</artifactId>
+            <version>1.0.2</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
