@@ -42,10 +42,9 @@ public class EconomyUCommand extends UserCommand {
                 return;
             }
             if(args[0].equalsIgnoreCase("top")){
-                System.out.println("top 5:");
                 Map<Long, Long> topFive = economyController.getTopFive(channel.getGuild());
                 if(topFive.isEmpty()){
-                    sendMessage(channel, invoker.getUser(), COLOR_GREEN, "No memebrs found", "No members were found.");
+                    sendMessage(channel, invoker.getUser(), COLOR_GREEN, "No members found", "No members were found.");
                     return;
                 }
                 EmbedBuilder builder = new EmbedBuilder()

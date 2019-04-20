@@ -72,18 +72,15 @@ public class EconomyController {
     public Map<Long, Long> getTopFive(Guild guild) {
         Map<Long, Long> allUsers = new HashMap<>();
         commentedFileConfig.entrySet().forEach(entry -> {
-            System.out.println(entry.getValue().toString() + " " + entry.getValue().getClass().getSimpleName());
             if (entry.getValue() instanceof Number) {
                 User user = guild.getJDA().getUserById(entry.getKey());
                 if (user != null && guild.getMember(user) != null)
                     allUsers.put(Long.parseLong(entry.getKey()), Long.parseLong(String.valueOf(((Integer) entry.getValue()))));
             }
         });
-        System.out.println(allUsers.size());
-        Map<Long, Long> sorted = allUsers.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(5)
+        return allUsers.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(5)
                 .collect(Collectors.toMap(
                         Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-        return sorted;
     }
 
     public void shutdown() {

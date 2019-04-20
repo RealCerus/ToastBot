@@ -37,7 +37,7 @@ public class SendThanksTCommand extends TerminalCommand {
         try {
             PrivateChannel channel = user.openPrivateChannel().complete();
             channel.sendMessage("// Test Message //\nby "+jda.getUserById(347018538713874444L).getAsMention()).complete();
-            channel.sendMessage(VoteUtil.getThankYouMessage(user, false)).complete();
+            channel.sendMessage(VoteUtil.getThankYouMessage(user, false, 0)).complete();
             System.out.println("Success");
         } catch (Exception e){
             System.out.println("Failed: "+e.getMessage());

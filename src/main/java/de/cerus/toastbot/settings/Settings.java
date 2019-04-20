@@ -30,6 +30,7 @@ public class Settings {
     private boolean setPresence;
     private boolean voteNeededForGifCommand;
     private boolean commandLog;
+    private boolean devEnv;
 
     public Settings(@Nonnull CommentedFileConfig commentedFileConfig) {
         this.commentedFileConfig = commentedFileConfig;
@@ -60,6 +61,7 @@ public class Settings {
         setVoteNeededForGifCommand(commentedFileConfig.get("vote-needed-for-cat-gif"));
         setCommandLog(commentedFileConfig.get("command-log"));
         setDblVoteAuth(commentedFileConfig.get("vote-token"));
+        setDevEnv(commentedFileConfig.getOrElse("dev-env", false));
     }
 
     public String getDiscordToken() {
@@ -171,5 +173,13 @@ public class Settings {
 
     public void setDblVoteAuth(String dblVoteAuth) {
         this.dblVoteAuth = dblVoteAuth;
+    }
+
+    public boolean isDevEnv() {
+        return devEnv;
+    }
+
+    public void setDevEnv(boolean devEnv) {
+        this.devEnv = devEnv;
     }
 }

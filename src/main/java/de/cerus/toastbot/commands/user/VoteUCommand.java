@@ -24,7 +24,7 @@ public class VoteUCommand extends UserCommand {
         if (!BotChannelUtil.isBotChannel(channel.getIdLong())) return;
 
         sendMessage(channel, invoker.getUser(), COLOR_GREEN, "Vote", "You can upvote the bot here: [Click me](https://discordbots.org/bot/565579372128501776)\n\n" +
-                "Vote rewards:\n`> +5 breadcrumbs (10 on weekends)`\n`> More rewards are following!`" +
+                "Vote rewards:\n`> +10 breadcrumbs (20 on weekends)`\n`> More rewards are following!`" +
                 "\n\n**Note:** Votes might take a while to be registered. Please be patient. The bot will send you a private message after the " +
                 "vote was registered but only if your DM's are open.");
     }

@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.JDA;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Deprecated
 public class WebServer {
 
     private Undertow undertow;
@@ -33,7 +34,7 @@ public class WebServer {
 
     public void start() {
         undertow = Undertow.builder()
-                .addHttpListener(8065, "lukassp.de")
+                .addHttpListener(8065, settings.isDevEnv() ? "localhost" : "lukassp.de")
                 .setHandler(exchange -> {
                     System.out.println("[Webserver] Handling request: " + exchange.getRequestURL());
                     HeaderMap headerValues = exchange.getRequestHeaders();

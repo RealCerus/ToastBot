@@ -41,9 +41,9 @@ public class ActivityTimerTask extends TimerTask {
         switch (step) {
             default:
             case 0:
-                int guilds = jda.getGuilds().size();
+                long guilds = jda.getGuilds().stream().filter(guild -> !guild.getId().equals(/*DBL Guild: */"264445053596991498")).count();
                 AtomicLong members = new AtomicLong();
-                jda.getGuilds().forEach(guild -> guild.getMembers().stream().filter(member -> !member.getUser().isBot()).forEach(member -> members.getAndIncrement()));
+                jda.getGuilds().stream().filter(guild -> !guild.getId().equals(/*DBL Guild: */"264445053596991498")).forEach(guild -> guild.getMembers().stream().filter(member -> !member.getUser().isBot()).forEach(member -> members.getAndIncrement()));
                 presence.setActivity(Activity.watching(guilds + (guilds == 1 ? " guild" : " guilds") + " with " + members.get() + (members.get() == 1 ? " member" : " members")));
                 step++;
                 break;

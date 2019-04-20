@@ -8,6 +8,7 @@
 package de.cerus.toastbot;
 
 import at.mukprojects.giphy4j.Giphy;
+import de.cerus.dblwebhookapi.WebhookServer;
 import de.cerus.toastbot.command.SendThanksTCommand;
 import de.cerus.toastbot.command.TerminalCommandReader;
 import de.cerus.toastbot.command.UserCommandReader;
@@ -20,7 +21,6 @@ import de.cerus.toastbot.event.VoteEventCaller;
 import de.cerus.toastbot.listeners.GuildListener;
 import de.cerus.toastbot.listeners.PrivateChannelListener;
 import de.cerus.toastbot.listeners.ReactionListener;
-import de.cerus.toastbot.server.WebServer;
 import de.cerus.toastbot.settings.Settings;
 import de.cerus.toastbot.tasks.ActivityTimerTask;
 import de.cerus.toastbot.tasks.BotChannelSaverTimerTask;
@@ -28,6 +28,7 @@ import de.cerus.toastbot.tasks.StatsTimerTask;
 import de.cerus.toastbot.tasks.VoteCheckerRunnable;
 import de.cerus.toastbot.util.*;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.discordbots.api.client.DiscordBotListAPI;
 import org.slf4j.Logger;
@@ -49,11 +50,11 @@ public class ToastBot {
     private TerminalCommandReader terminalCommandReader;
     private UserCommandReader userCommandReader;
     private DiscordBotListAPI botListAPI;
-    private Thread voteChecker;
+/*    private Thread voteChecker;
     private VoteCheckerRunnable voteCheckerRunnable;
-    private VoteEventCaller voteEventCaller;
+    private VoteEventCaller voteEventCaller;*/
     private EconomyController economyController;
-    private WebServer webServer;
+    private WebhookServer webhookServer;
 
     public ToastBot(@Nonnull JDA jda, @Nonnull Settings settings) {
         this.jda = jda;
@@ -62,8 +63,9 @@ public class ToastBot {
         this.terminalCommandReader = new TerminalCommandReader();
         this.userCommandReader = new UserCommandReader(settings);
         this.botListAPI = new DiscordBotListAPI.Builder().token(settings.getDblToken()).botId(jda.getSelfUser().getId()).build();
-        this.voteEventCaller = new VoteEventCaller();
-        this.webServer = new WebServer(voteEventCaller, settings, jda);
+        //this.voteEventCaller = new VoteEventCaller();
+        this.webhookServer = new WebhookServer.Builder().setAuthorization(settings.getDblVoteAuth())
+                .setBotId(jda.getSelfUser().getId()).setHost(settings.isDevEnv() ? "localhost" : "lukassp.de").setPort(8065).setSilent(false).build();
     }
 
     public void launch() {
@@ -79,17 +81,23 @@ public class ToastBot {
         Giphy giphy = new Giphy(settings.getGiphyToken());
         EmoteUtil.initialize(jda);
         VoteUtil.initialize(economyController, giphy);
+        TopVoterUtil.initialize(jda);
         startVoteCheck();
 
         // Register the only vote listener
-        voteEventCaller.registerListener((user, isWeekend) -> {
+        webhookServer.registerListener((userId, botId, isTest, isWeekend) -> {
+            User user = jda.getUserById(userId);
+            if(user == null) return;
             System.out.print("[Vote] " + user.getAsTag() + " voted");
-            economyController.addBreadcrumbs(user, isWeekend ? 20 : 10);
+            TopVoterUtil.addVote(user);
+            int multiplier = TopVoterUtil.getVotes(user) == 5 ? 5 : TopVoterUtil.getVotes(user) == 15 ?
+                    10 : TopVoterUtil.getVotes(user) == 30 ? 20 : TopVoterUtil.getVotes(user) >= 60 ? 50 : 0;
+            economyController.addBreadcrumbs(user, isWeekend ? 20 + multiplier : 10 + multiplier);
             try {
                 user.openPrivateChannel().complete().sendMessage(
-                        VoteUtil.getThankYouMessage(user, isWeekend)
+                        VoteUtil.getThankYouMessage(user, isWeekend, multiplier)
                 ).complete();
-                System.out.println("\n");
+                System.out.println();
             } catch (Exception ignored) {
                 System.out.print(" | failed to send DM\n");
             }
@@ -117,7 +125,8 @@ public class ToastBot {
                 new EconomyUCommand(economyController),
                 new SearchGifUCommand(giphy),
                 new VoteUCommand(),
-                new ToastBattleUCommand()
+                new ToastBattleUCommand(),
+                new TopVotersUCommand()
         );
         userCommandReader.start(jda);
 
@@ -141,7 +150,7 @@ public class ToastBot {
         /*voteCheckerRunnable = new VoteCheckerRunnable(jda, botListAPI, voteEventCaller);
         voteChecker = new Thread(voteCheckerRunnable);
         voteChecker.start();*/
-        webServer.start();
+        webhookServer.start();
     }
 
     public void shutdown() {
@@ -149,16 +158,19 @@ public class ToastBot {
             presenceTimer.cancel();
         botChannelSaver.cancel();
         statsTimer.cancel();
-        if (voteCheckerRunnable != null) {
+/*        if (voteCheckerRunnable != null) {
             voteCheckerRunnable.setInterrupted(true);
             voteCheckerRunnable.shutdown();
         }
         if (voteChecker != null)
-            voteChecker.interrupt();
+            voteChecker.interrupt();*/
         terminalCommandReader.shutdown();
         userCommandReader.shutdown();
         BotChannelUtil.shutdown();
-        webServer.shutdown();
+        try {
+            webhookServer.stop();
+        } catch (Exception ignored){
+        }
         economyController.shutdown();
 
         jda.shutdown();
