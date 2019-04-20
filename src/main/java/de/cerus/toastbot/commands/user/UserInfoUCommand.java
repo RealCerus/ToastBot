@@ -24,6 +24,7 @@ public class UserInfoUCommand extends UserCommand {
         super("user-info");
         this.economyController = economyController;
         setUsage(getCommand() + " [@<user>]");
+        setDescription("Shows information about a user or yourself.");
     }
 
     @Override
@@ -48,6 +49,7 @@ public class UserInfoUCommand extends UserCommand {
                         .addField("Next upgrade cost:", user.getNextUpgradeCost() == -1 ? "/" : user.getNextUpgradeCost() + " " + EmoteUtil.getBreadcrumbEmote(), false)
                         .addField("Can upgrade:", user.canUpgrade(economyController) ? ":white_check_mark:" : ":no_entry_sign:", false)
                         .addField("Breadcrumbs:", economyController.getBreadcrumbs(member)+" "+EmoteUtil.getBreadcrumbEmote(), false)
+                        .addField("Inventory:", user.getInventory().toString(), false)
                         .setFooter(invoker.getUser().getAsTag(), invoker.getUser().getAvatarUrl())
                         .build()
         ).complete();

@@ -10,17 +10,10 @@ package de.cerus.toastbot.commands.user;
 import de.cerus.toastbot.command.UserCommand;
 import de.cerus.toastbot.command.UserCommandReader;
 import de.cerus.toastbot.util.BotChannelUtil;
-import de.cerus.toastbot.util.HelpPagination;
-import de.cerus.toastbot.util.Pagination;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class HelpUCommand extends UserCommand {
     private UserCommandReader commandReader;
@@ -28,7 +21,7 @@ public class HelpUCommand extends UserCommand {
     public HelpUCommand(UserCommandReader commandReader) {
         super("help");
         this.commandReader = commandReader;
-        setUsage(getCommand()+" [page]");
+        setUsage(getCommand() + " [page]");
         setDescription("Displays all commands.");
     }
 
@@ -40,26 +33,26 @@ public class HelpUCommand extends UserCommand {
         }
 
         int page;
-        if(args.length == 0){
+        if (args.length == 0) {
             page = 1;
         } else {
             try {
                 page = Integer.parseInt(args[0]);
-            } catch (NumberFormatException ignored){
-                sendFailure(channel, invoker.getUser(), "Please use `"+getSettings().getCommandPrefix(channel.getGuild())+"help [page]`");
+            } catch (NumberFormatException ignored) {
+                sendFailure(channel, invoker.getUser(), "Please use `" + getSettings().getCommandPrefix(channel.getGuild()) + "help [page]`");
                 return;
             }
         }
         page--;
-        if(page >= commandReader.getHelpPagination().totalPages()){
+        if (page >= commandReader.getHelpPagination().totalPages()) {
             page = 0;
         }
 
         EmbedBuilder builder = new EmbedBuilder()
                 .setColor(COLOR_BLUE)
-                .setTitle("**Help | Page "+(page+1)+" of "+commandReader.getHelpPagination().totalPages()+"**")
+                .setTitle("**Help | Page " + (page + 1) + " of " + commandReader.getHelpPagination().totalPages() + "**")
                 .setAuthor(channel.getJDA().getSelfUser().getName(), null, channel.getJDA().getSelfUser().getAvatarUrl())
-                .setDescription("All available commands are listed below.")
+                .setDescription("All available commands are listed below. Total commands: "+commandReader.getHelpPagination().size())
                 .setFooter("\u200BToast Bot help", invoker.getUser().getAvatarUrl());
         String commandPrefix = getSettings().getCommandPrefix(channel.getGuild());
         commandReader.getHelpPagination().getPage(page, commandPrefix).forEach(builder::addField);

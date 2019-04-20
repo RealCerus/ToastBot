@@ -24,6 +24,8 @@ import de.cerus.toastbot.settings.Settings;
 import de.cerus.toastbot.tasks.ActivityTimerTask;
 import de.cerus.toastbot.tasks.BotChannelSaverTimerTask;
 import de.cerus.toastbot.tasks.StatsTimerTask;
+import de.cerus.toastbot.user.ToastBotUser;
+import de.cerus.toastbot.user.items.*;
 import de.cerus.toastbot.util.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
@@ -81,6 +83,7 @@ public class ToastBot {
         VoteUtil.initialize(economyController, giphy);
         TopVoterUtil.initialize(jda);
         startVoteCheck();
+        registerItems();
 
         // Register the only vote listener
         webhookServer.registerListener((userId, botId, isTest, isWeekend) -> {
@@ -88,6 +91,17 @@ public class ToastBot {
             if (user == null) return;
             System.out.print("[Vote] " + user.getAsTag() + " voted");
             TopVoterUtil.addVote(user);
+            long votes = TopVoterUtil.getVotes(user);
+            ToastBotUser toastBotUser = new ToastBotUser(user);
+            if(votes == 10)
+                toastBotUser.getInventory().addItem(new BronzeVoteAwardItem(1));
+            if(votes == 25)
+                toastBotUser.getInventory().addItem(new SilverVoteAwardItem(1));
+            if(votes == 50)
+                toastBotUser.getInventory().addItem(new GoldenVoteAwardItem(1));
+            if(votes == 100)
+                toastBotUser.getInventory().addItem(new PlatinumVoteAwardItem(1));
+            toastBotUser.save();
             int multiplier = TopVoterUtil.getVotes(user) == 5 ? 5 : TopVoterUtil.getVotes(user) == 15 ?
                     10 : TopVoterUtil.getVotes(user) == 30 ? 20 : TopVoterUtil.getVotes(user) >= 60 ? 50 : 0;
             economyController.addBreadcrumbs(user, isWeekend ? 20 + multiplier : 10 + multiplier);
@@ -126,7 +140,10 @@ public class ToastBot {
                 new ToastBattleUCommand(),
                 new TopVotersUCommand(),
                 new UpgradeHpUCommand(economyController),
-                new UserInfoUCommand(economyController)
+                new UserInfoUCommand(economyController),
+                new ItemInfoUCommand(),
+                new UseItemUCommand(),
+                new SellItemUCommand(economyController)
         );
         userCommandReader.start(jda);
 
@@ -138,6 +155,15 @@ public class ToastBot {
         );
 
         logger.info("The launch of Toast Bot is now complete.");
+    }
+
+    private void registerItems() {
+        GlobalItemRegistry.registerItems(
+                new BronzeVoteAwardItem(1),
+                new SilverVoteAwardItem(1),
+                new GoldenVoteAwardItem(1),
+                new PlatinumVoteAwardItem(1)
+        );
     }
 
     private void registerEventListeners(ListenerAdapter... adapters) {

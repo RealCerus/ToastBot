@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.User;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 
 public class ToastBotUser {
@@ -42,14 +43,17 @@ public class ToastBotUser {
 
         if (commentedFileConfig.contains("hp"))
             this.toastBattleHP = commentedFileConfig.get("hp");
+
+        if (commentedFileConfig.contains("inventory"))
+            this.inventory = Inventory.ofString(commentedFileConfig.get("inventory"));
     }
 
     public ToastBotUser(User user, int toastBattleHP) {
-        this(user, new Inventory(Collections.emptySet()), toastBattleHP);
+        this(user, new Inventory(new ArrayList<>()), toastBattleHP);
     }
 
     public ToastBotUser(User user) {
-        this(user, new Inventory(Collections.emptySet()), 100);
+        this(user, new Inventory(new ArrayList<>()), 100);
     }
 
     public int getNextUpgradeHP() {
@@ -106,6 +110,7 @@ public class ToastBotUser {
 
     public void save() {
         commentedFileConfig.set("hp", toastBattleHP);
+        commentedFileConfig.set("inventory", inventory.toJsonString());
         commentedFileConfig.save();
     }
 

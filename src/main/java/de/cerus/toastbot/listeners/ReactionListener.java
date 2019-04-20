@@ -64,7 +64,7 @@ public class ReactionListener extends ListenerAdapter {
                     .setColor(2127320)
                     .setTitle("**Help | Page "+(page+1)+" of "+userCommandReader.getHelpPagination().totalPages()+"**")
                     .setAuthor(event.getJDA().getSelfUser().getName(), null, event.getJDA().getSelfUser().getAvatarUrl())
-                    .setDescription("All available commands are listed below.")
+                    .setDescription("All available commands are listed below. Total commands: "+userCommandReader.getHelpPagination().size())
                     .setFooter("\u200BToast Bot help", event.getMember().getUser().getAvatarUrl());
             String commandPrefix = settings.getCommandPrefix(event.getGuild());
             userCommandReader.getHelpPagination().getPage(page, commandPrefix).forEach(builder::addField);
@@ -77,7 +77,7 @@ public class ReactionListener extends ListenerAdapter {
                     .setColor(2127320)
                     .setTitle("**Help | Page "+(page-1)+" of "+userCommandReader.getHelpPagination().totalPages()+"**")
                     .setAuthor(event.getJDA().getSelfUser().getName(), null, event.getJDA().getSelfUser().getAvatarUrl())
-                    .setDescription("All available commands are listed below.")
+                    .setDescription("All available commands are listed below. Total commands: "+userCommandReader.getHelpPagination().size())
                     .setFooter("\u200BToast Bot help", event.getMember().getUser().getAvatarUrl());
             String commandPrefix = settings.getCommandPrefix(event.getGuild());
             userCommandReader.getHelpPagination().getPage(page-2, commandPrefix).forEach(builder::addField);
