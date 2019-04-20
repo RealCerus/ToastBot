@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
+@Deprecated
 public class VoteEventCaller {
 
     private Set<BiConsumer<User, Boolean>> listeners;

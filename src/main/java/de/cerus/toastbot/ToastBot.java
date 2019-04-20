@@ -17,7 +17,6 @@ import de.cerus.toastbot.commands.terminal.HelpTCommand;
 import de.cerus.toastbot.commands.terminal.ShutdownTCommand;
 import de.cerus.toastbot.commands.user.*;
 import de.cerus.toastbot.economy.EconomyController;
-import de.cerus.toastbot.event.VoteEventCaller;
 import de.cerus.toastbot.listeners.GuildListener;
 import de.cerus.toastbot.listeners.PrivateChannelListener;
 import de.cerus.toastbot.listeners.ReactionListener;
@@ -25,7 +24,6 @@ import de.cerus.toastbot.settings.Settings;
 import de.cerus.toastbot.tasks.ActivityTimerTask;
 import de.cerus.toastbot.tasks.BotChannelSaverTimerTask;
 import de.cerus.toastbot.tasks.StatsTimerTask;
-import de.cerus.toastbot.tasks.VoteCheckerRunnable;
 import de.cerus.toastbot.util.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
@@ -50,9 +48,9 @@ public class ToastBot {
     private TerminalCommandReader terminalCommandReader;
     private UserCommandReader userCommandReader;
     private DiscordBotListAPI botListAPI;
-/*    private Thread voteChecker;
-    private VoteCheckerRunnable voteCheckerRunnable;
-    private VoteEventCaller voteEventCaller;*/
+    /*    private Thread voteChecker;
+        private VoteCheckerRunnable voteCheckerRunnable;
+        private VoteEventCaller voteEventCaller;*/
     private EconomyController economyController;
     private WebhookServer webhookServer;
 
@@ -87,7 +85,7 @@ public class ToastBot {
         // Register the only vote listener
         webhookServer.registerListener((userId, botId, isTest, isWeekend) -> {
             User user = jda.getUserById(userId);
-            if(user == null) return;
+            if (user == null) return;
             System.out.print("[Vote] " + user.getAsTag() + " voted");
             TopVoterUtil.addVote(user);
             int multiplier = TopVoterUtil.getVotes(user) == 5 ? 5 : TopVoterUtil.getVotes(user) == 15 ?
@@ -126,7 +124,9 @@ public class ToastBot {
                 new SearchGifUCommand(giphy),
                 new VoteUCommand(),
                 new ToastBattleUCommand(),
-                new TopVotersUCommand()
+                new TopVotersUCommand(),
+                new UpgradeHpUCommand(economyController),
+                new UserInfoUCommand(economyController)
         );
         userCommandReader.start(jda);
 
@@ -169,7 +169,7 @@ public class ToastBot {
         BotChannelUtil.shutdown();
         try {
             webhookServer.stop();
-        } catch (Exception ignored){
+        } catch (Exception ignored) {
         }
         economyController.shutdown();
 

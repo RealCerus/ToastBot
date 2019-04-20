@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.*;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public abstract class UserCommand {
 
@@ -38,16 +39,7 @@ public abstract class UserCommand {
     public void sendNoCommandChannelFailure(TextChannel channel, User user){
         Message message = sendFailure(channel, user, "Commands can only be used in bot channels. " +
                 "If you believe this is an error please contact an admin. More info can be found [here](https://github.com/RealCerus/ToastBot/blob/master/FAQ.md#no-command-works)");
-
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    message.delete().complete();
-                } catch (Exception ignored){
-                }
-            }
-        }, 8000);
+        message.delete().completeAfter(8, TimeUnit.SECONDS);
     }
 
     public Message sendFailure(TextChannel channel, User user, String message) {

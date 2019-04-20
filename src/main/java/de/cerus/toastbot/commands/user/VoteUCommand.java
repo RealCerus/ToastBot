@@ -21,7 +21,10 @@ public class VoteUCommand extends UserCommand {
 
     @Override
     public void execute(String usedCommand, Member invoker, Message message, TextChannel channel, String[] args) {
-        if (!BotChannelUtil.isBotChannel(channel.getIdLong())) return;
+        if (!BotChannelUtil.isBotChannel(channel)) {
+            sendNoCommandChannelFailure(channel, invoker.getUser());
+            return;
+        }
 
         sendMessage(channel, invoker.getUser(), COLOR_GREEN, "Vote", "You can upvote the bot here: [Click me](https://discordbots.org/bot/565579372128501776)\n\n" +
                 "Vote rewards:\n`> +10 breadcrumbs (20 on weekends)`\n`> More rewards are following!`" +

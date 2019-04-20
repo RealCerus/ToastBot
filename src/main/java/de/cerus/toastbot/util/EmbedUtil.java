@@ -14,6 +14,7 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.DeleteErrorException;
 import com.dropbox.core.v2.files.FileMetadata;
 import de.cerus.toastbot.settings.Settings;
+import de.cerus.toastbot.user.ToastBotUser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -172,6 +173,9 @@ public class EmbedUtil {
                     e.printStackTrace();
                 }
 
+                int userOneHP = new ToastBotUser(userOne).getToastBattleHP();
+                int userTwoHP = new ToastBotUser(userTwo).getToastBattleHP();
+
                 // Trying to edit the message to add the download link and the generated image
                 try {
                     if (link != null) {
@@ -180,27 +184,26 @@ public class EmbedUtil {
                                         .setColor(8311585)
                                         .setTitle("Toast battle", "https://cerus-dev.de/")
                                         .setDescription("Battle started!")
-                                        .addField(userOne.getAsTag(), "**100** HP", true)
-                                        .addField(userTwo.getAsTag(), "**100** HP", true)
+                                        .addField(userOne.getAsTag(), "**"+userOneHP+"** HP", true)
+                                        .addField(userTwo.getAsTag(), "**"+userTwoHP+"** HP", true)
                                         .setImage(link)
                                         .build()
                         ).complete();
                         Thread.sleep(3000);
-                        battle(message, 100, 100, userOne, userTwo, link, metadata.getPathDisplay() == null ? "" : metadata.getPathDisplay(), battleImage);
+                        battle(message, userOneHP, userTwoHP, userOne, userTwo, link, metadata.getPathDisplay() == null ? "" : metadata.getPathDisplay(), battleImage);
                     } else {
                         message.editMessage(
                                 new EmbedBuilder()
                                         .setColor(8311585)
                                         .setTitle("Toast battle", "https://cerus-dev.de/")
                                         .setDescription("Battle started!")
-                                        .addField(userOne.getAsTag(), "**100** HP", true)
-                                        .addField(userTwo.getAsTag(), "**100** HP", true)
+                                        .addField(userOne.getAsTag(), "**"+userOneHP+"** HP", true)
+                                        .addField(userTwo.getAsTag(), "**"+userTwoHP+"** HP", true)
                                         .build()
                         ).complete();
                         message.getChannel().sendFile(battleImage).complete();
                         Thread.sleep(3000);
-                        battle(message, 100, 100, userOne, userTwo, "http://some.link", metadata == null ? "" : metadata.getPathDisplay(), battleImage);
-                        message.getChannel().sendFile(battleImage).complete();
+                        battle(message, userOneHP, userTwoHP, userOne, userTwo, "http://some.link", metadata == null ? "" : metadata.getPathDisplay(), battleImage);
                     }
                 } catch (ErrorResponseException e) {
                     e.printStackTrace();

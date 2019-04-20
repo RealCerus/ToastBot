@@ -17,9 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
+@Deprecated
 public class VoteCheckerRunnable implements Runnable {
     private JDA jda;
     private DiscordBotListAPI discordBotListAPI;
